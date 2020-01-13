@@ -1,5 +1,5 @@
 {
-module Parser.Parser (parse) where
+module Parser.Parser (parse, Exp(..)) where
 
 import Lexer.Lexer (Token(..))
 }
@@ -9,11 +9,11 @@ import Lexer.Lexer (Token(..))
 %error { parseError }
 
 %token
-        int             { TokenInt $$}
-        '+'             { TokenPlus }
-        '-'             { TokenMinus }
-        '*'             { TokenTimes }
-        '/'             { TokenDiv }
+	int             { TokenInt $$}
+	'+'             { TokenPlus }
+	'-'             { TokenMinus }
+	'*'             { TokenTimes }
+	'/'             { TokenDiv }
 
 %left '+' '-' '*' '/'
 

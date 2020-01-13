@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -w #-}
-module Parser.Parser (parse) where
+module Parser.Parser (parse, Exp(..)) where
 
 import Lexer.Lexer (Token(..))
 import qualified Data.Array as Happy_Data_Array
