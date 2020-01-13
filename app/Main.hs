@@ -1,6 +1,10 @@
 module Main where
 
-import Lib
+import           Lexer.Lexer
+import           Parser.Parser
 
 main :: IO ()
-main = someFunc
+main = do
+    s <- getLine
+    let ast = happyParser $ alexScanTokens s
+    print ast
