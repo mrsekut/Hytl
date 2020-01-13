@@ -6,5 +6,5 @@ import           Parser.Parser
 main :: IO ()
 main = do
     s <- getLine
-    let ast = happyParser $ alexScanTokens s
+    let ast = parse $ lexer s
     print ast

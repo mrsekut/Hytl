@@ -3,7 +3,7 @@
 {-# LINE 1 "lexer.x" #-}
 
 {-# LANGUAGE OverloadedStrings                 #-}
-module Lexer.Lexer (alexScanTokens, Token(..)) where
+module Lexer.Lexer (lexer, Token(..)) where
 
 #if __GLASGOW_HASKELL__ >= 603
 #include "ghcconfig.h"
@@ -451,7 +451,7 @@ alexGetByte (_,[],(c:s)) = case utf8Encode' c of
 alex_tab_size :: Int
 alex_tab_size = 8
 alex_base :: Array Int Int
-alex_base = listArray (0 :: Int, 14)
+alex_base = listArray (0 :: Int, 16)
   [ -8
   , -141
   , 0
@@ -467,6 +467,8 @@ alex_base = listArray (0 :: Int, 14)
   , -37
   , 0
   , -24
+  , 0
+  , 0
   ]
 
 alex_table :: Array Int Int
@@ -505,12 +507,12 @@ alex_table = listArray (0 :: Int, 921)
   , 0
   , 0
   , 0
-  , 0
+  , 15
   , 13
   , 0
   , 14
   , 0
-  , 0
+  , 16
   , 12
   , 12
   , 12
@@ -1431,12 +1433,12 @@ alex_check = listArray (0 :: Int, 921)
   , -1
   , -1
   , -1
-  , -1
+  , 42
   , 43
   , -1
   , 45
   , -1
-  , -1
+  , 47
   , 48
   , 49
   , 50
@@ -2322,7 +2324,7 @@ alex_check = listArray (0 :: Int, 921)
   ]
 
 alex_deflt :: Array Int Int
-alex_deflt = listArray (0 :: Int, 14)
+alex_deflt = listArray (0 :: Int, 16)
   [ -1
   , 9
   , 9
@@ -2338,9 +2340,11 @@ alex_deflt = listArray (0 :: Int, 14)
   , -1
   , -1
   , -1
+  , -1
+  , -1
   ]
 
-alex_accept = listArray (0 :: Int, 14)
+alex_accept = listArray (0 :: Int, 16)
   [ AlexAccNone
   , AlexAccNone
   , AlexAccNone
@@ -2353,18 +2357,22 @@ alex_accept = listArray (0 :: Int, 14)
   , AlexAccNone
   , AlexAccSkip
   , AlexAccSkip
+  , AlexAcc 4
+  , AlexAcc 3
   , AlexAcc 2
   , AlexAcc 1
   , AlexAcc 0
   ]
 
-alex_actions = array (0 :: Int, 3)
-  [ (2,alex_action_2)
-  , (1,alex_action_3)
-  , (0,alex_action_4)
+alex_actions = array (0 :: Int, 5)
+  [ (4,alex_action_2)
+  , (3,alex_action_3)
+  , (2,alex_action_4)
+  , (1,alex_action_5)
+  , (0,alex_action_6)
   ]
 
-{-# LINE 19 "lexer.x" #-}
+{-# LINE 21 "lexer.x" #-}
 
 
 -- The token type:
@@ -2372,12 +2380,18 @@ data Token
   = TokenInt Int
   | TokenPlus
   | TokenMinus
+  | TokenTimes
+  | TokenDiv
   deriving (Eq,Show)
+
+lexer = alexScanTokens
 
 
 alex_action_2 =  \s -> TokenInt (read s) 
 alex_action_3 =  \s -> TokenPlus 
 alex_action_4 =  \s -> TokenMinus 
+alex_action_5 =  \s -> TokenTimes 
+alex_action_6 =  \s -> TokenDiv 
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- -----------------------------------------------------------------------------
 -- ALEX TEMPLATE

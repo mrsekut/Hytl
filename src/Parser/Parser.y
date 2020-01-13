@@ -1,10 +1,10 @@
 {
-module Parser.Parser (happyParser) where
+module Parser.Parser (parse) where
 
 import Lexer.Lexer (Token(..))
 }
 
-%name happyParser
+%name parse
 %tokentype { Token }
 %error { parseError }
 
@@ -12,14 +12,18 @@ import Lexer.Lexer (Token(..))
         int             { TokenInt $$}
         '+'             { TokenPlus }
         '-'             { TokenMinus }
+        '*'             { TokenTimes }
+        '/'             { TokenDiv }
 
-%left '+' '-'
+%left '+' '-' '*' '/'
 
 %%
 
 Exp
 	: Exp '+' Exp			{ Plus $1 $3 }
 	| Exp '-' Exp			{ Minus $1 $3 }
+	| Exp '*' Exp			{ Times $1 $3 }
+	| Exp '/' Exp			{ Div $1 $3 }
 	| int					{ Int $1 }
 
 
@@ -31,7 +35,9 @@ parseError _ = error "Parse error"
 data Exp
 	= Plus Exp Exp
 	| Minus Exp Exp
+	| Times Exp Exp
+	| Div Exp Exp
 	| Int Int
-	deriving Show
+	deriving (Eq, Show)
 
 }

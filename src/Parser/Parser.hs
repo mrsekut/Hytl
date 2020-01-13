@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -w #-}
-module Parser.Parser (happyParser) where
+module Parser.Parser (parse) where
 
 import Lexer.Lexer (Token(..))
 import qualified Data.Array as Happy_Data_Array
@@ -15,18 +15,18 @@ data HappyAbsSyn t4
 	| HappyAbsSyn4 t4
 
 happyExpList :: Happy_Data_Array.Array Int Int
-happyExpList = Happy_Data_Array.listArray (0,14) ([4112,96,4192,16,0,0
+happyExpList = Happy_Data_Array.listArray (0,22) ([16400,7680,57344,65,1025,16,0,0,0,0
 	])
 
 {-# NOINLINE happyExpListPerState #-}
 happyExpListPerState st =
     token_strs_expected
-  where token_strs = ["error","%dummy","%start_happyParser","Exp","int","'+'","'-'","%eof"]
-        bit_start = st * 8
-        bit_end = (st + 1) * 8
+  where token_strs = ["error","%dummy","%start_parse","Exp","int","'+'","'-'","'*'","'/'","%eof"]
+        bit_start = st * 10
+        bit_end = (st + 1) * 10
         read_bit = readArrayBit happyExpList
         bits = map read_bit [bit_start..bit_end - 1]
-        bits_indexed = zip bits [0..7]
+        bits_indexed = zip bits [0..9]
         token_strs_expected = concatMap f bits_indexed
         f (False, _) = []
         f (True, nr) = [token_strs !! nr]
@@ -41,26 +41,42 @@ action_1 _ = happyFail (happyExpListPerState 1)
 
 action_2 (6) = happyShift action_5
 action_2 (7) = happyShift action_6
+action_2 (8) = happyShift action_7
+action_2 (9) = happyShift action_8
 action_2 _ = happyFail (happyExpListPerState 2)
 
-action_3 _ = happyReduce_3
+action_3 _ = happyReduce_5
 
 action_4 (6) = happyShift action_5
 action_4 (7) = happyShift action_6
-action_4 (8) = happyAccept
+action_4 (8) = happyShift action_7
+action_4 (9) = happyShift action_8
+action_4 (10) = happyAccept
 action_4 _ = happyFail (happyExpListPerState 4)
 
 action_5 (5) = happyShift action_3
-action_5 (4) = happyGoto action_8
+action_5 (4) = happyGoto action_12
 action_5 _ = happyFail (happyExpListPerState 5)
 
 action_6 (5) = happyShift action_3
-action_6 (4) = happyGoto action_7
+action_6 (4) = happyGoto action_11
 action_6 _ = happyFail (happyExpListPerState 6)
 
-action_7 _ = happyReduce_2
+action_7 (5) = happyShift action_3
+action_7 (4) = happyGoto action_10
+action_7 _ = happyFail (happyExpListPerState 7)
 
-action_8 _ = happyReduce_1
+action_8 (5) = happyShift action_3
+action_8 (4) = happyGoto action_9
+action_8 _ = happyFail (happyExpListPerState 8)
+
+action_9 _ = happyReduce_4
+
+action_10 _ = happyReduce_3
+
+action_11 _ = happyReduce_2
+
+action_12 _ = happyReduce_1
 
 happyReduce_1 = happySpecReduce_3  4 happyReduction_1
 happyReduction_1 (HappyAbsSyn4  happy_var_3)
@@ -80,15 +96,33 @@ happyReduction_2 (HappyAbsSyn4  happy_var_3)
 	)
 happyReduction_2 _ _ _  = notHappyAtAll 
 
-happyReduce_3 = happySpecReduce_1  4 happyReduction_3
-happyReduction_3 (HappyTerminal (TokenInt happy_var_1))
+happyReduce_3 = happySpecReduce_3  4 happyReduction_3
+happyReduction_3 (HappyAbsSyn4  happy_var_3)
+	_
+	(HappyAbsSyn4  happy_var_1)
+	 =  HappyAbsSyn4
+		 (Times happy_var_1 happy_var_3
+	)
+happyReduction_3 _ _ _  = notHappyAtAll 
+
+happyReduce_4 = happySpecReduce_3  4 happyReduction_4
+happyReduction_4 (HappyAbsSyn4  happy_var_3)
+	_
+	(HappyAbsSyn4  happy_var_1)
+	 =  HappyAbsSyn4
+		 (Div happy_var_1 happy_var_3
+	)
+happyReduction_4 _ _ _  = notHappyAtAll 
+
+happyReduce_5 = happySpecReduce_1  4 happyReduction_5
+happyReduction_5 (HappyTerminal (TokenInt happy_var_1))
 	 =  HappyAbsSyn4
 		 (Int happy_var_1
 	)
-happyReduction_3 _  = notHappyAtAll 
+happyReduction_5 _  = notHappyAtAll 
 
 happyNewToken action sts stk [] =
-	action 8 8 notHappyAtAll (HappyState action) sts stk []
+	action 10 10 notHappyAtAll (HappyState action) sts stk []
 
 happyNewToken action sts stk (tk:tks) =
 	let cont i = action i i tk (HappyState action) sts stk tks in
@@ -96,10 +130,12 @@ happyNewToken action sts stk (tk:tks) =
 	TokenInt happy_dollar_dollar -> cont 5;
 	TokenPlus -> cont 6;
 	TokenMinus -> cont 7;
+	TokenTimes -> cont 8;
+	TokenDiv -> cont 9;
 	_ -> happyError' ((tk:tks), [])
 	}
 
-happyError_ explist 8 tk tks = happyError' (tks, explist)
+happyError_ explist 10 tk tks = happyError' (tks, explist)
 happyError_ explist _ tk tks = happyError' ((tk:tks), explist)
 
 newtype HappyIdentity a = HappyIdentity a
@@ -125,7 +161,7 @@ happyReturn1 :: () => a -> b -> HappyIdentity a
 happyReturn1 = \a tks -> (return) a
 happyError' :: () => ([(Token)], [String]) -> HappyIdentity a
 happyError' = HappyIdentity . (\(tokens, _) -> parseError tokens)
-happyParser tks = happyRunIdentity happySomeParser where
+parse tks = happyRunIdentity happySomeParser where
  happySomeParser = happyThen (happyParse action_0 tks) (\x -> case x of {HappyAbsSyn4 z -> happyReturn z; _other -> notHappyAtAll })
 
 happySeq = happyDontSeq
@@ -137,8 +173,10 @@ parseError _ = error "Parse error"
 data Exp
 	= Plus Exp Exp
 	| Minus Exp Exp
+	| Times Exp Exp
+	| Div Exp Exp
 	| Int Int
-	deriving Show
+	deriving (Eq, Show)
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- $Id: GenericTemplate.hs,v 1.26 2005/01/14 14:47:22 simonmar Exp $
 

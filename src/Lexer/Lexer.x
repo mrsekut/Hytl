@@ -1,6 +1,6 @@
 {
 {-# LANGUAGE OverloadedStrings                 #-}
-module Lexer.Lexer (alexScanTokens, Token(..)) where
+module Lexer.Lexer (lexer, Token(..)) where
 }
 
 %wrapper "basic"
@@ -15,6 +15,8 @@ tokens :-
   $digit+				                    { \s -> TokenInt (read s) }
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
+  \*                                { \s -> TokenTimes }
+  \/                                { \s -> TokenDiv }
 
 {
 
@@ -23,6 +25,10 @@ data Token
   = TokenInt Int
   | TokenPlus
   | TokenMinus
+  | TokenTimes
+  | TokenDiv
   deriving (Eq,Show)
+
+lexer = alexScanTokens
 
 }
