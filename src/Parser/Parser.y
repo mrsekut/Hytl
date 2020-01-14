@@ -10,17 +10,19 @@ import Lexer.Lexer (Token(..))
 
 %token
 	int             { TokenInt $$}
+	'='             { TokenEq }
 	'+'             { TokenPlus }
 	'-'             { TokenMinus }
 	'*'             { TokenTimes }
 	'/'             { TokenDiv }
 
-%left '+' '-' '*' '/'
+%left '+' '-' '*' '/' '='
 
 %%
 
 Exp
-	: Exp '+' Exp			{ Plus $1 $3 }
+	: Exp '=' Exp			{ Eq $1 $3 }
+	| Exp '+' Exp			{ Plus $1 $3 }
 	| Exp '-' Exp			{ Minus $1 $3 }
 	| Exp '*' Exp			{ Times $1 $3 }
 	| Exp '/' Exp			{ Div $1 $3 }
@@ -33,7 +35,8 @@ parseError :: [Token] -> a
 parseError _ = error "Parse error"
 
 data Exp
-	= Plus Exp Exp
+	= Eq Exp Exp
+	| Plus Exp Exp
 	| Minus Exp Exp
 	| Times Exp Exp
 	| Div Exp Exp

@@ -13,6 +13,7 @@ tokens :-
   $white+				                    ;
   "--".*				                    ;
   $digit+				                    { \s -> TokenInt (read s) }
+  \=                                { \s -> TokenEq}
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
   \*                                { \s -> TokenTimes }
@@ -23,6 +24,7 @@ tokens :-
 -- The token type:
 data Token
   = TokenInt Int
+  | TokenEq
   | TokenPlus
   | TokenMinus
   | TokenTimes

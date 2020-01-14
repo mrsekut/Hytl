@@ -451,28 +451,29 @@ alexGetByte (_,[],(c:s)) = case utf8Encode' c of
 alex_tab_size :: Int
 alex_tab_size = 8
 alex_base :: Array Int Int
-alex_base = listArray (0 :: Int, 16)
+alex_base = listArray (0 :: Int, 17)
   [ -8
-  , -141
-  , 0
-  , -28
-  , 0
-  , 100
-  , 228
-  , 484
-  , 420
-  , 0
-  , -3
-  , 666
-  , -37
+  , -137
   , 0
   , -24
+  , 0
+  , 104
+  , 232
+  , 488
+  , 424
+  , 0
+  , -3
+  , 670
+  , -37
+  , 0
+  , 0
+  , -23
   , 0
   , 0
   ]
 
 alex_table :: Array Int Int
-alex_table = listArray (0 :: Int, 921)
+alex_table = listArray (0 :: Int, 925)
   [ 0
   , 10
   , 10
@@ -494,9 +495,9 @@ alex_table = listArray (0 :: Int, 921)
   , 12
   , 12
   , 12
+  , 0
   , 11
   , 0
-  , 0
   , 10
   , 0
   , 0
@@ -506,13 +507,13 @@ alex_table = listArray (0 :: Int, 921)
   , 0
   , 0
   , 0
-  , 0
-  , 15
-  , 13
-  , 0
-  , 14
   , 0
   , 16
+  , 14
+  , 0
+  , 15
+  , 0
+  , 17
   , 12
   , 12
   , 12
@@ -523,6 +524,10 @@ alex_table = listArray (0 :: Int, 921)
   , 12
   , 12
   , 12
+  , 0
+  , 0
+  , 0
+  , 13
   , 8
   , -1
   , -1
@@ -1398,7 +1403,7 @@ alex_table = listArray (0 :: Int, 921)
   ]
 
 alex_check :: Array Int Int
-alex_check = listArray (0 :: Int, 921)
+alex_check = listArray (0 :: Int, 925)
   [ -1
   , 9
   , 10
@@ -1420,8 +1425,8 @@ alex_check = listArray (0 :: Int, 921)
   , 55
   , 56
   , 57
-  , 45
   , -1
+  , 45
   , -1
   , 32
   , -1
@@ -1449,6 +1454,10 @@ alex_check = listArray (0 :: Int, 921)
   , 55
   , 56
   , 57
+  , -1
+  , -1
+  , -1
+  , 61
   , 191
   , 192
   , 193
@@ -2324,7 +2333,7 @@ alex_check = listArray (0 :: Int, 921)
   ]
 
 alex_deflt :: Array Int Int
-alex_deflt = listArray (0 :: Int, 16)
+alex_deflt = listArray (0 :: Int, 17)
   [ -1
   , 9
   , 9
@@ -2342,9 +2351,10 @@ alex_deflt = listArray (0 :: Int, 16)
   , -1
   , -1
   , -1
+  , -1
   ]
 
-alex_accept = listArray (0 :: Int, 16)
+alex_accept = listArray (0 :: Int, 17)
   [ AlexAccNone
   , AlexAccNone
   , AlexAccNone
@@ -2357,6 +2367,7 @@ alex_accept = listArray (0 :: Int, 16)
   , AlexAccNone
   , AlexAccSkip
   , AlexAccSkip
+  , AlexAcc 5
   , AlexAcc 4
   , AlexAcc 3
   , AlexAcc 2
@@ -2364,20 +2375,22 @@ alex_accept = listArray (0 :: Int, 16)
   , AlexAcc 0
   ]
 
-alex_actions = array (0 :: Int, 5)
-  [ (4,alex_action_2)
-  , (3,alex_action_3)
-  , (2,alex_action_4)
-  , (1,alex_action_5)
-  , (0,alex_action_6)
+alex_actions = array (0 :: Int, 6)
+  [ (5,alex_action_2)
+  , (4,alex_action_3)
+  , (3,alex_action_4)
+  , (2,alex_action_5)
+  , (1,alex_action_6)
+  , (0,alex_action_7)
   ]
 
-{-# LINE 21 "lexer.x" #-}
+{-# LINE 22 "lexer.x" #-}
 
 
 -- The token type:
 data Token
   = TokenInt Int
+  | TokenEq
   | TokenPlus
   | TokenMinus
   | TokenTimes
@@ -2388,10 +2401,11 @@ lexer = alexScanTokens
 
 
 alex_action_2 =  \s -> TokenInt (read s) 
-alex_action_3 =  \s -> TokenPlus 
-alex_action_4 =  \s -> TokenMinus 
-alex_action_5 =  \s -> TokenTimes 
-alex_action_6 =  \s -> TokenDiv 
+alex_action_3 =  \s -> TokenEq
+alex_action_4 =  \s -> TokenPlus 
+alex_action_5 =  \s -> TokenMinus 
+alex_action_6 =  \s -> TokenTimes 
+alex_action_7 =  \s -> TokenDiv 
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- -----------------------------------------------------------------------------
 -- ALEX TEMPLATE
