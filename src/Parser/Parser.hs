@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -w #-}
-module Parser.Parser (parse, Exp(..)) where
+module Parser.Parser (parse) where
 
+import Parser.AST (Exp(..))
 import Lexer.Lexer (Token(..))
 import qualified Data.Array as Happy_Data_Array
 import qualified Data.Bits as Bits
@@ -231,17 +232,6 @@ happySeq = happyDontSeq
 
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
-
-data Exp
-	= Plus Exp Exp
-	| Minus Exp Exp
-	| Times Exp Exp
-	| Div Exp Exp
-	| Int Int
-	| Lambda String String Exp
-	| Call String Int
-	| Var String
-	deriving (Eq, Show)
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- $Id: GenericTemplate.hs,v 1.26 2005/01/14 14:47:22 simonmar Exp $
 

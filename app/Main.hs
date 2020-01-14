@@ -2,6 +2,8 @@ module Main where
 
 import           Lexer.Lexer
 import           Parser.Parser
+import           Parser.AST
+import           Data.IORef
 
 
 type Env = String -> Exp

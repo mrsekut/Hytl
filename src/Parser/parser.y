@@ -1,6 +1,7 @@
 {
-module Parser.Parser (parse, Exp(..)) where
+module Parser.Parser (parse) where
 
+import Parser.AST (Exp(..))
 import Lexer.Lexer (Token(..))
 }
 
@@ -40,16 +41,5 @@ Exp
 
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
-
-data Exp
-	= Int Int
-	| Plus Exp Exp
-	| Minus Exp Exp
-	| Times Exp Exp
-	| Div Exp Exp
-	| Lambda String String Exp
-	| Call String Int
-	| Var String
-	deriving (Eq, Show)
 
 }
