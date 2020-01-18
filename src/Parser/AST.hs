@@ -9,7 +9,6 @@ data Exp
     | Minus Exp Exp
     | Times Exp Exp
     | Div Exp Exp
-    | Lambda String String Exp
-    | Call String Int
     | Var String
+    | Assign String Exp
     deriving (Eq, Show)

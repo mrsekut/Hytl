@@ -13,7 +13,6 @@ tokens :-
   $white+				                    ;
   "--".*				                    ;
   $digit+				                    { \s -> TokenInt (read s) }
-  fn                                { \s -> TokenLambda }
   \=                                { \s -> TokenEq}
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
@@ -32,7 +31,6 @@ data Token
   | TokenTimes
   | TokenDiv
   | TokenVar String
-  | TokenLambda
   deriving (Eq,Show)
 
 lexer = alexScanTokens

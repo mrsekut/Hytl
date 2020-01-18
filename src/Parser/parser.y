@@ -12,7 +12,6 @@ import Lexer.Lexer (Token(..))
 %token
 	int             { TokenInt $$}
 	var				{ TokenVar $$ }
-	fn				{ TokenLambda }
 	'+'             { TokenPlus }
 	'-'             { TokenMinus }
 	'*'             { TokenTimes }
@@ -27,12 +26,11 @@ import Lexer.Lexer (Token(..))
 %%
 
 Exp
-	: fn var var '=' Exp	{ Lambda $2 $3 $5}
-	| var int				{ Call $1 $2 }
-	| Exp '+' Exp			{ Plus $1 $3 }
+	: Exp '+' Exp			{ Plus $1 $3 }
 	| Exp '-' Exp			{ Minus $1 $3 }
 	| Exp '*' Exp			{ Times $1 $3 }
 	| Exp '/' Exp			{ Div $1 $3 }
+	| var '=' Exp			{ Assign $1 $3 }
 	| int					{ Int $1 }
 	| var					{ Var $1 }
 
