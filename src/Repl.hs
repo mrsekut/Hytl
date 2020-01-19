@@ -24,7 +24,7 @@ evalRepl = repl eval_'
 repl :: (String -> String) -> IO ()
 repl eval = do
     input <- read_
-    unless (input == ":quit") $ print_ (eval input) >> repl
+    unless (input == ":quit") $ print_ (eval input) >> repl eval
 
 
 read_ :: IO String
