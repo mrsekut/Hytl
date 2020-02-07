@@ -2,15 +2,23 @@
 
 ## Build
 
-`$ stack build`
+`$ ./run.sh`
 
 ## Run
 
-`$ stack exec hytl-exe`<br>
+`$ stack exec -- hytl-exe`
 
-ex. `> 1+1`
+### AST Mode
 
-## Create Lexer and Parser
+`$ stack exec -- hytl-exe -a`
 
-- `$ alex lexer.x -o ./Lexer.hs`
-- `$ happy parser.y -o ./Parser.hs`
+- ex. `> 1+1`
+- out. `Plus (Int 2) (Int 3)`
+
+### Quit
+
+`> :quit`
+
+### Help
+
+`$ stack exec -- hytl-exe -h`
