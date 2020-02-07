@@ -20,18 +20,20 @@ astRepl = repl showAST
 
 evalRepl :: IO ()
 evalRepl = do
-    input <- read_
-    env   <- emptyEnv
-    print_ $ show (eval ((parse . lexer) input) env)
-
-
--- evalRepl = repl showEval
+    env <- emptyEnv
+    replEval showEval env
 
 
 repl :: (String -> String) -> IO ()
 repl eval = do
     input <- read_
     unless (input == ":quit") $ print_ (eval input) >> repl eval
+
+
+replEval :: (String -> Env -> String) -> Env -> IO ()
+replEval eval env = do
+    input <- read_
+    unless (input == ":quit") $ print_ (eval input env) >> replEval eval env
 
 
 read_ :: IO String
@@ -44,9 +46,8 @@ read_ = do
 showAST :: String -> String
 showAST = show . parse . lexer
 
-showEval :: String -> String
--- showEval s = show $ emptyEnv >>= (eval ((parse . lexer) s))
-showEval = showAST
+showEval :: String -> Env -> String
+showEval s env = show (eval ((parse . lexer) s) env)
 
 
 print_ :: String -> IO ()

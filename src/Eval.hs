@@ -1,6 +1,7 @@
 module Eval
     ( eval
     , emptyEnv
+    , Env
     )
 where
 
