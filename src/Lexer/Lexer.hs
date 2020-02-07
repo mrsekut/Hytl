@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-unused-binds -fno-warn-missing-signatures #-}
 {-# LANGUAGE CPP #-}
-{-# LINE 1 "lexer.x" #-}
+{-# LINE 1 "src/Lexer/lexer.x" #-}
 
 {-# LANGUAGE OverloadedStrings                 #-}
 module Lexer.Lexer (lexer, Token(..)) where
@@ -2510,7 +2510,7 @@ alex_actions = array (0 :: Int, 7)
   , (0,alex_action_8)
   ]
 
-{-# LINE 23 "lexer.x" #-}
+{-# LINE 23 "src/Lexer/lexer.x" #-}
 
 
 -- The token type:

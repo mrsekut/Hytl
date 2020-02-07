@@ -14,10 +14,7 @@ data CLI = CLI { ast :: Bool }
 
 cli :: IO ()
 cli = astOption =<< execParser opts
- where
-  opts = info
-    (config <**> helper)
-    (fullDesc <> progDesc "Hytl REPL")
+    where opts = info (config <**> helper) (fullDesc <> progDesc "Hytl REPL")
 
 config :: Parser CLI
 config =
@@ -25,5 +22,5 @@ config =
 
 
 astOption :: CLI -> IO ()
-astOption (CLI False) = astRepl
+astOption (CLI False) = evalRepl
 astOption _           = evalRepl

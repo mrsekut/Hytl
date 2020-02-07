@@ -10,15 +10,15 @@ $alpha = [a-zA-Z] -- alphabets
 
 tokens :-
 
-  $white+				                    ;
-  "--".*				                    ;
-  $digit+				                    { \s -> TokenInt (read s) }
+  $white+                           ;
+  "--".*                            ;
+  $digit+                           { \s -> TokenInt (read s) }
   \=                                { \s -> TokenEq}
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
   \*                                { \s -> TokenTimes }
   \/                                { \s -> TokenDiv }
-  $alpha [$alpha $digit \_ \']*		  { \s -> TokenVar s }
+  $alpha [$alpha $digit \_ \']*     { \s -> TokenVar s }
 
 {
 

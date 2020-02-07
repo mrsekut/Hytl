@@ -1,22 +1,50 @@
-module Eval where
+module Eval
+    ( eval
+    , emptyEnv
+    )
+where
 
-import           Lexer.Lexer
-import           Parser.Parser
 import           Parser.AST
 import           Data.IORef
+import           Data.Maybe
 
 
 
-type Env = IORef [(String, Exp)]
+type Env = IORef [(String, IORef Exp)]
 
--- emptyEnv :: Env
--- emptyEnv = newIORef []
+emptyEnv :: IO Env
+emptyEnv = newIORef []
 
--- envBind :: String -> Exp -> Env -> Env
--- envBind s v env = undefined
+isBound :: String -> Env -> IO Bool
+isBound var env = isJust . lookup var <$> readIORef env
 
--- envLookup :: String -> Env -> Exp
--- envLookup x env = undefined
+setVar :: String -> Exp -> Env -> IO Exp
+setVar var value env = do
+    e <- readIORef env
+    case lookup var e of
+        Just v  -> writeIORef v value
+        Nothing -> return ()
+    return value
+
+
+envBind :: String -> Exp -> Env -> IO Exp
+envBind var value env = do
+    al <- isBound var env
+    if al
+        then (setVar var value env) >> return value
+        else do
+            v <- newIORef value
+            e <- readIORef env
+            writeIORef env ((var, v) : e)
+            return value
+
+
+getVar :: String -> Env -> IO Exp
+getVar var env = do
+    e <- readIORef env
+    case lookup var e of
+        Just v  -> readIORef v
+        Nothing -> return (Int (-1))
 
 
 eval :: Exp -> Env -> Int

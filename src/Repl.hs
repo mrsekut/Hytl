@@ -8,6 +8,7 @@ where
 import           Lexer.Lexer
 import           Parser.Parser
 import           Parser.AST
+import           Eval
 import           System.IO
 import           Control.Monad                  ( unless )
 import           System.Environment             ( getArgs )
@@ -15,10 +16,16 @@ import           Options.Applicative
 
 
 astRepl :: IO ()
-astRepl = repl eval_
+astRepl = repl showAST
 
 evalRepl :: IO ()
-evalRepl = repl eval_'
+evalRepl = do
+    input <- read_
+    env   <- emptyEnv
+    print_ $ show (eval ((parse . lexer) input) env)
+
+
+-- evalRepl = repl showEval
 
 
 repl :: (String -> String) -> IO ()
@@ -34,12 +41,12 @@ read_ = do
     getLine
 
 
-eval_ :: String -> String
-eval_ = show . parse . lexer
+showAST :: String -> String
+showAST = show . parse . lexer
 
-eval_' :: String -> String
--- eval_' s = show (eval ((parse . lexer) s) emptyEnv)
-eval_' = eval_
+showEval :: String -> String
+-- showEval s = show $ emptyEnv >>= (eval ((parse . lexer) s))
+showEval = showAST
 
 
 print_ :: String -> IO ()

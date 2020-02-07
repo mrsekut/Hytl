@@ -10,13 +10,13 @@ import Lexer.Lexer (Token(..))
 %error { parseError }
 
 %token
-	int             { TokenInt $$}
+	int				{ TokenInt $$}
 	var				{ TokenVar $$ }
-	'+'             { TokenPlus }
-	'-'             { TokenMinus }
-	'*'             { TokenTimes }
-	'/'             { TokenDiv }
-	'='             { TokenEq }
+	'+'				{ TokenPlus }
+	'-'				{ TokenMinus }
+	'*'				{ TokenTimes }
+	'/'				{ TokenDiv }
+	'='				{ TokenEq }
 
 
 %right '='
