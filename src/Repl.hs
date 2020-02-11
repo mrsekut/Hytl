@@ -10,36 +10,26 @@ import           Parser.Parser
 import           Eval
 import           System.IO
 import           Control.Monad                  ( unless )
-import           System.Environment             ( getArgs )
 
 
 -- ast mode
 astRepl :: IO ()
-astRepl = repl showAST
+astRepl = do
+    env <- emptyEnv
+    repl showAST env
 
-showAST :: String -> String
-showAST = show . parse . lexer
-
-repl :: (String -> String) -> IO ()
-repl eval = do
-    input <- read_
-    unless (input == ":quit") $ print_ (eval input) >> repl eval
-
+showAST :: String -> Env -> String
+showAST s _ = (show . parse . lexer) s
 
 
 -- eval mode
 evalRepl :: IO ()
 evalRepl = do
     env <- emptyEnv
-    replEval showEval env
+    repl showEval env
 
 showEval :: String -> Env -> String
 showEval s env = show (eval ((parse . lexer) s) env)
-
-replEval :: (String -> Env -> String) -> Env -> IO ()
-replEval eval env = do
-    input <- read_
-    unless (input == ":quit") $ print_ (eval input env) >> replEval eval env
 
 
 -- core
@@ -51,3 +41,9 @@ read_ = do
 
 print_ :: String -> IO ()
 print_ = putStrLn
+
+repl :: (String -> Env -> String) -> Env -> IO ()
+repl eval env = do
+    input <- read_
+    unless (input == ":quit") $ print_ (eval input env) >> repl eval env
+
