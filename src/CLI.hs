@@ -23,4 +23,4 @@ config =
 
 astOption :: CLI -> IO ()
 astOption (CLI False) = evalRepl
-astOption _           = evalRepl
+astOption _           = astRepl

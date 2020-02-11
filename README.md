@@ -8,6 +8,9 @@
 
 `$ stack exec -- hytl-exe`
 
+- ex. `> 1+1`
+- out. `2`
+
 ### AST Mode
 
 `$ stack exec -- hytl-exe -a`
