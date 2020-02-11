@@ -11,4 +11,5 @@ data Exp
     | Div Exp Exp
     | Var String
     | Assign String Exp
+    | Lambda String Exp
     deriving (Eq, Show)

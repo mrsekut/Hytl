@@ -18,6 +18,7 @@ tokens :-
   \-                                { \s -> TokenMinus }
   \*                                { \s -> TokenTimes }
   \/                                { \s -> TokenDiv }
+  \=>                               { \s -> TokenLambda }
   $alpha [$alpha $digit \_ \']*     { \s -> TokenVar s }
 
 {
@@ -30,6 +31,7 @@ data Token
   | TokenMinus
   | TokenTimes
   | TokenDiv
+  | TokenLambda
   | TokenVar String
   deriving (Eq,Show)
 

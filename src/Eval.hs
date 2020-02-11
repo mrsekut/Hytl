@@ -54,5 +54,5 @@ eval (Plus  a b) env = (eval a env) + (eval b env)
 eval (Minus a b) env = (eval a env) - (eval b env)
 eval (Times a b) env = (eval a env) * (eval b env)
 eval (Div   a b) env = (eval a env) `quot` (eval b env)
--- eval (Assign n x) env = eval x (envBind n x env)
--- eval (Var x     ) env = eval (envLookup x env) env
+-- eval (Assign v x) env = eval x (envBind v x env)
+-- eval (Var x     ) env = eval (getVar x env) env

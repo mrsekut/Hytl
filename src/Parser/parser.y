@@ -17,9 +17,11 @@ import Lexer.Lexer (Token(..))
 	'*'				{ TokenTimes }
 	'/'				{ TokenDiv }
 	'='				{ TokenEq }
+	"=>"			{ TokenLambda }
 
 
 %right '='
+%left "=>"
 %left '+' '-'
 %left '*' '/'
 
@@ -31,6 +33,7 @@ Exp
 	| Exp '*' Exp			{ Times $1 $3 }
 	| Exp '/' Exp			{ Div $1 $3 }
 	| var '=' Exp			{ Assign $1 $3 }
+	| var "=>" Exp			{ Lambda $1 $3 }
 	| int					{ Int $1 }
 	| var					{ Var $1 }
 
