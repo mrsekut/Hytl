@@ -14,40 +14,23 @@ import           Control.Monad                  ( unless )
 
 -- ast mode
 astRepl :: IO ()
-astRepl = do
-    env <- emptyEnv
-    repl showAST env
+astRepl = repl showAST
 
-showAST :: String -> Env -> String
-showAST s _ = (show . parse . lexer) s
+showAST :: String -> String
+showAST s = (show . parse . lexer) s
+
+repl :: (String -> String) -> IO ()
+repl eval = do
+    input <- read_
+    unless (input == ":quit") $ print_ (eval input) >> repl eval
 
 
 -- eval mode
 evalRepl :: IO ()
-evalRepl = do
-    env <- emptyEnv
-    replIO showEval env
+evalRepl = replIO showEval =<< emptyEnv
 
 showEval :: String -> Env -> IO Int
 showEval s env = eval ((parse . lexer) s) env
-
-
--- core
-read_ :: IO String
-read_ = do
-    putStr "hytl> "
-    hFlush stdout
-    getLine
-
-print_ :: String -> IO ()
-print_ = putStrLn
-
-repl :: (String -> Env -> String) -> Env -> IO ()
-repl eval env = do
-    input <- read_
-    unless (input == ":quit") $ print_ (eval input env) >> repl eval env
-
-
 
 replIO :: (String -> Env -> IO Int) -> Env -> IO ()
 replIO eval env = do
@@ -57,3 +40,13 @@ replIO eval env = do
         print_ $ show value
         replIO eval env
 
+
+-- utils
+read_ :: IO String
+read_ = do
+    putStr "hytl> "
+    hFlush stdout
+    getLine
+
+print_ :: String -> IO ()
+print_ = putStrLn

@@ -15,7 +15,7 @@ type Env = IORef [(String, IORef Exp)]
 
 -- eval
 eval :: Exp -> Env -> IO Int
-eval (Int n   ) _   = return n
+eval (Int n     ) _   = return n
 eval (Plus x1 x2) env = do
     n1 <- eval x1 env
     n2 <- eval x2 env
@@ -38,6 +38,7 @@ eval (Var x) env = do
 eval (Assign v x) env = do
     envBind v x env
     eval x env
+
 
 emptyEnv :: IO Env
 emptyEnv = newIORef []
