@@ -26,10 +26,10 @@ showAST s _ = (show . parse . lexer) s
 evalRepl :: IO ()
 evalRepl = do
     env <- emptyEnv
-    repl showEval env
+    replIO showEval env
 
-showEval :: String -> Env -> String
-showEval s env = show (eval ((parse . lexer) s) env)
+showEval :: String -> Env -> IO Int
+showEval s env = eval ((parse . lexer) s) env
 
 
 -- core
@@ -46,4 +46,14 @@ repl :: (String -> Env -> String) -> Env -> IO ()
 repl eval env = do
     input <- read_
     unless (input == ":quit") $ print_ (eval input env) >> repl eval env
+
+
+
+replIO :: (String -> Env -> IO Int) -> Env -> IO ()
+replIO eval env = do
+    input <- read_
+    unless (input == ":quit") $ do
+        value <- eval input env
+        print_ $ show value
+        replIO eval env
 
