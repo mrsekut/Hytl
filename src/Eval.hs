@@ -38,6 +38,9 @@ eval (Var x) env = do
 eval (Assign v x) env = do
     envBind v x env
     eval x env
+eval (Lambda f x) env = do
+    envBind f x env
+    eval (Int (-1)) env
 
 
 emptyEnv :: IO Env
