@@ -13,7 +13,10 @@ import           Control.Monad                  ( liftM )
 
 type Env = IORef [(String, IORef Exp)]
 
--- eval
+
+
+{- Eval -}
+
 eval :: Exp -> Env -> IO Int
 eval (Int n     ) _   = return n
 eval (Plus x1 x2) env = do
@@ -46,8 +49,14 @@ eval (Call f x) env = do
     localEnv        <- bindVars [(arg, x)] env
     eval body localEnv
 
+
+
+{- Utils -}
+
+
 emptyEnv :: IO Env
 emptyEnv = newIORef []
+
 
 getVar :: String -> Env -> IO Exp
 getVar var env = do
@@ -56,16 +65,29 @@ getVar var env = do
         Just v  -> readIORef v
         Nothing -> return (Var "error")
 
+
 envBind :: String -> Exp -> Env -> IO Exp
-envBind var value env = do
-    al <- isBound var env
-    if al
-        then (setVar var value env) >> return value
+envBind var ast env = do
+    hasVar <- isBound var env
+    if hasVar
+        then setVar var ast env >> return ast
         else do
-            v <- newIORef value
+            a <- newIORef ast
             e <- readIORef env
-            writeIORef env ((var, v) : e)
-            return value
+            writeIORef env ((var, a) : e)
+            return ast
+  where
+    isBound :: String -> Env -> IO Bool
+    isBound var env = isJust . lookup var <$> readIORef env
+
+    setVar :: String -> Exp -> Env -> IO Exp
+    setVar var ast env = do
+        e <- readIORef env
+        case lookup var e of
+            Just v  -> writeIORef v ast
+            Nothing -> return ()
+        return ast
+
 
 bindVars :: [(String, Exp)] -> Env -> IO Env
 bindVars bindings envRef = readIORef envRef >>= extendEnv bindings >>= newIORef
@@ -74,18 +96,3 @@ bindVars bindings envRef = readIORef envRef >>= extendEnv bindings >>= newIORef
     addBinding (var, value) = do
         ref <- newIORef value
         return (var, ref)
-
-
-
-
-isBound :: String -> Env -> IO Bool
-isBound var env = isJust . lookup var <$> readIORef env
-
-setVar :: String -> Exp -> Env -> IO Exp
-setVar var value env = do
-    e <- readIORef env
-    case lookup var e of
-        Just v  -> writeIORef v value
-        Nothing -> return ()
-    return value
-
