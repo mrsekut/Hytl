@@ -8,7 +8,7 @@ where
 import           Parser.AST
 import           Data.IORef
 import           Data.Maybe
-
+import           Control.Monad                  ( liftM )
 
 
 type Env = IORef [(String, IORef Exp)]
@@ -41,7 +41,10 @@ eval (Assign v x) env = do
 eval (Lambda f x) env = do
     envBind f x env
     eval (Int (-1)) env
-
+eval (Call f x) env = do
+    Lambda arg body <- getVar f env
+    localEnv        <- bindVars [(arg, x)] env
+    eval body localEnv
 
 emptyEnv :: IO Env
 emptyEnv = newIORef []
@@ -63,6 +66,16 @@ envBind var value env = do
             e <- readIORef env
             writeIORef env ((var, v) : e)
             return value
+
+bindVars :: [(String, Exp)] -> Env -> IO Env
+bindVars bindings envRef = readIORef envRef >>= extendEnv bindings >>= newIORef
+  where
+    extendEnv bindings env = liftM (++ env) (mapM addBinding bindings)
+    addBinding (var, value) = do
+        ref <- newIORef value
+        return (var, ref)
+
+
 
 
 isBound :: String -> Env -> IO Bool
