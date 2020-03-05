@@ -13,4 +13,5 @@ data Exp
     | Assign String Exp
     | Lambda String Exp
     | Call String Exp
+    | If Exp Exp Exp
     deriving (Eq, Show)

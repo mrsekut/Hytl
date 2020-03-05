@@ -21,6 +21,9 @@ tokens :-
   \=>                               { \s -> TokenLambda }
   \(                                { \s -> TokenLParen }
   \)                                { \s -> TokenRParen }
+  if                                { \s -> TokenIf }
+  then                              { \s -> TokenThen }
+  else                              { \s -> TokenElse }
   $alpha [$alpha $digit \_ \']*     { \s -> TokenVar s }
 
 {
@@ -36,6 +39,9 @@ data Token
   | TokenLambda
   | TokenLParen
   | TokenRParen
+  | TokenIf
+  | TokenThen
+  | TokenElse
   | TokenVar String
   deriving (Eq,Show)
 

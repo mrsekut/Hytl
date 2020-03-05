@@ -20,6 +20,9 @@ import Lexer.Lexer (Token(..))
 	"=>"			{ TokenLambda }
 	'('				{ TokenLParen }
 	')'				{ TokenRParen }
+	"if"			{ TokenIf }
+	"then"			{ TokenThen }
+	"else"			{ TokenElse }
 
 
 %right '='
@@ -30,15 +33,16 @@ import Lexer.Lexer (Token(..))
 %%
 
 Exp
-	: var '=' Exp			{ Assign $1 $3 }
-	| var '(' Exp ')'		{ Call $1 $3 }
-	| Exp '+' Exp			{ Plus $1 $3 }
-	| Exp '-' Exp			{ Minus $1 $3 }
-	| Exp '*' Exp			{ Times $1 $3 }
-	| Exp '/' Exp			{ Div $1 $3 }
-	| var "=>" Exp			{ Lambda $1 $3 }
-	| int					{ Int $1 }
-	| var					{ Var $1 }
+	: var '=' Exp						{ Assign $1 $3 }
+	| var '(' Exp ')'					{ Call $1 $3 }
+	| "if" Exp "then" Exp "else" Exp	{ If $2 $4 $6 }
+	| Exp '+' Exp						{ Plus $1 $3 }
+	| Exp '-' Exp						{ Minus $1 $3 }
+	| Exp '*' Exp						{ Times $1 $3 }
+	| Exp '/' Exp						{ Div $1 $3 }
+	| var "=>" Exp						{ Lambda $1 $3 }
+	| int								{ Int $1 }
+	| var								{ Var $1 }
 
 
 {
