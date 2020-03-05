@@ -32,15 +32,11 @@ import Lexer.Lexer (Token(..))
 Exp
 	: var '=' Exp			{ Assign $1 $3 }
 	| var '(' Exp ')'		{ Call $1 $3 }
-	| Exp1					{ $1 }
-
-
-Exp1
-	: Exp1 '+' Exp1			{ Plus $1 $3 }
-	| Exp1 '-' Exp1			{ Minus $1 $3 }
-	| Exp1 '*' Exp1			{ Times $1 $3 }
-	| Exp1 '/' Exp1			{ Div $1 $3 }
-	| var "=>" Exp1			{ Lambda $1 $3 }
+	| Exp '+' Exp			{ Plus $1 $3 }
+	| Exp '-' Exp			{ Minus $1 $3 }
+	| Exp '*' Exp			{ Times $1 $3 }
+	| Exp '/' Exp			{ Div $1 $3 }
+	| var "=>" Exp			{ Lambda $1 $3 }
 	| int					{ Int $1 }
 	| var					{ Var $1 }
 
