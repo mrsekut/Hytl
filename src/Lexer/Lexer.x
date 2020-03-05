@@ -5,14 +5,17 @@ module Lexer.Lexer (lexer, Token(..)) where
 
 %wrapper "basic"
 
-$digit = 0-9			-- digits
-$alpha = [a-zA-Z] -- alphabets
+$digit = 0-9
+$alpha = [a-zA-Z]
+
+@bool = (true) | (false)
 
 tokens :-
 
   $white+                           ;
   "--".*                            ;
   $digit+                           { \s -> TokenInt (read s) }
+  @bool                             { \b -> TokenBool (if b == "true" then True else False) }
   \=                                { \s -> TokenEq}
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
@@ -43,6 +46,7 @@ data Token
   | TokenThen
   | TokenElse
   | TokenVar String
+  | TokenBool Bool
   deriving (Eq,Show)
 
 lexer = alexScanTokens

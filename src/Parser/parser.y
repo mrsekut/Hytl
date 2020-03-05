@@ -12,6 +12,7 @@ import Lexer.Lexer (Token(..))
 %token
 	int				{ TokenInt $$}
 	var				{ TokenVar $$ }
+	bool			{ TokenBool $$ }
 	'+'				{ TokenPlus }
 	'-'				{ TokenMinus }
 	'*'				{ TokenTimes }
@@ -27,6 +28,7 @@ import Lexer.Lexer (Token(..))
 
 %right '='
 %left "=>"
+%left "if" "then" "else"
 %left '+' '-'
 %left '*' '/'
 
@@ -43,6 +45,7 @@ Exp
 	| var "=>" Exp						{ Lambda $1 $3 }
 	| int								{ Int $1 }
 	| var								{ Var $1 }
+	| bool								{ Bool $1 }
 
 
 {

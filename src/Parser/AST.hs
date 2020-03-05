@@ -5,6 +5,7 @@ where
 
 data Exp
     = Int Int
+    | Bool Bool
     | Plus Exp Exp
     | Minus Exp Exp
     | Times Exp Exp
