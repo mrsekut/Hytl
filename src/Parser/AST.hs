@@ -10,6 +10,7 @@ data Exp
     | Minus Exp Exp
     | Times Exp Exp
     | Div Exp Exp
+    | Gt Exp Exp
     | Var String
     | Assign String Exp
     | Lambda String Exp

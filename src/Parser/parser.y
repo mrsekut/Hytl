@@ -24,11 +24,13 @@ import Lexer.Lexer (Token(..))
 	"if"			{ TokenIf }
 	"then"			{ TokenThen }
 	"else"			{ TokenElse }
+	'>'				{ TokenGT }
 
 
 %right '='
 %left "=>"
 %left "if" "then" "else"
+%left '>'
 %left '+' '-'
 %left '*' '/'
 
@@ -42,6 +44,7 @@ Exp
 	| Exp '-' Exp						{ Minus $1 $3 }
 	| Exp '*' Exp						{ Times $1 $3 }
 	| Exp '/' Exp						{ Div $1 $3 }
+	| Exp '>' Exp						{ Gt $1 $3 }
 	| var "=>" Exp						{ Lambda $1 $3 }
 	| int								{ Int $1 }
 	| var								{ Var $1 }

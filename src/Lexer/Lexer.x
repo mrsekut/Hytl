@@ -24,6 +24,7 @@ tokens :-
   \=>                               { \s -> TokenLambda }
   \(                                { \s -> TokenLParen }
   \)                                { \s -> TokenRParen }
+  \>                                { \s -> TokenGT }
   if                                { \s -> TokenIf }
   then                              { \s -> TokenThen }
   else                              { \s -> TokenElse }
@@ -42,6 +43,7 @@ data Token
   | TokenLambda
   | TokenLParen
   | TokenRParen
+  | TokenGT
   | TokenIf
   | TokenThen
   | TokenElse
