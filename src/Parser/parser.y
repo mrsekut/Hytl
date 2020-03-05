@@ -18,6 +18,8 @@ import Lexer.Lexer (Token(..))
 	'/'				{ TokenDiv }
 	'='				{ TokenEq }
 	"=>"			{ TokenLambda }
+	'('				{ TokenLParen }
+	')'				{ TokenRParen }
 
 
 %right '='
@@ -29,7 +31,7 @@ import Lexer.Lexer (Token(..))
 
 Exp
 	: var '=' Exp			{ Assign $1 $3 }
-	| var Exp				{ Call $1 $2 }
+	| var '(' Exp ')'		{ Call $1 $3 }
 	| Exp1					{ $1 }
 
 

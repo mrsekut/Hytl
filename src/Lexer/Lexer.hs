@@ -451,7 +451,7 @@ alexGetByte (_,[],(c:s)) = case utf8Encode' c of
 alex_tab_size :: Int
 alex_tab_size = 8
 alex_base :: Array Int Int
-alex_base = listArray (0 :: Int, 19)
+alex_base = listArray (0 :: Int, 21)
   [ -8
   , -76
   , 0
@@ -468,6 +468,8 @@ alex_base = listArray (0 :: Int, 19)
   , -41
   , 0
   , -23
+  , 0
+  , 0
   , 0
   , 0
   , 0
@@ -508,8 +510,8 @@ alex_table = listArray (0 :: Int, 986)
   , 10
   , 0
   , 0
-  , 0
-  , 0
+  , 19
+  , 20
   , 16
   , 14
   , 0
@@ -533,64 +535,64 @@ alex_table = listArray (0 :: Int, 986)
   , 0
   , 0
   , 0
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
   , 0
   , 0
   , 0
   , 0
   , 0
   , 0
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
   , 8
   , -1
   , -1
@@ -1218,7 +1220,7 @@ alex_table = listArray (0 :: Int, 986)
   , -1
   , -1
   , -1
-  , 19
+  , 21
   , 0
   , 0
   , 0
@@ -1227,16 +1229,16 @@ alex_table = listArray (0 :: Int, 986)
   , 0
   , 0
   , 0
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
   , 0
   , 0
   , 0
@@ -1244,64 +1246,64 @@ alex_table = listArray (0 :: Int, 986)
   , 0
   , 0
   , 0
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
   , 0
   , 0
   , 0
   , 0
-  , 19
+  , 21
   , 0
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
-  , 19
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
+  , 21
   , 0
   , 0
   , 0
@@ -1499,8 +1501,8 @@ alex_check = listArray (0 :: Int, 986)
   , 32
   , -1
   , -1
-  , -1
-  , -1
+  , 40
+  , 41
   , 42
   , 43
   , -1
@@ -2457,7 +2459,7 @@ alex_check = listArray (0 :: Int, 986)
   ]
 
 alex_deflt :: Array Int Int
-alex_deflt = listArray (0 :: Int, 19)
+alex_deflt = listArray (0 :: Int, 21)
   [ -1
   , 9
   , 9
@@ -2478,9 +2480,11 @@ alex_deflt = listArray (0 :: Int, 19)
   , -1
   , -1
   , -1
+  , -1
+  , -1
   ]
 
-alex_accept = listArray (0 :: Int, 19)
+alex_accept = listArray (0 :: Int, 21)
   [ AlexAccNone
   , AlexAccNone
   , AlexAccNone
@@ -2493,6 +2497,8 @@ alex_accept = listArray (0 :: Int, 19)
   , AlexAccNone
   , AlexAccSkip
   , AlexAccSkip
+  , AlexAcc 9
+  , AlexAcc 8
   , AlexAcc 7
   , AlexAcc 6
   , AlexAcc 5
@@ -2503,18 +2509,20 @@ alex_accept = listArray (0 :: Int, 19)
   , AlexAcc 0
   ]
 
-alex_actions = array (0 :: Int, 8)
-  [ (7,alex_action_2)
-  , (6,alex_action_3)
-  , (5,alex_action_4)
-  , (4,alex_action_5)
-  , (3,alex_action_6)
-  , (2,alex_action_7)
-  , (1,alex_action_8)
-  , (0,alex_action_9)
+alex_actions = array (0 :: Int, 10)
+  [ (9,alex_action_2)
+  , (8,alex_action_3)
+  , (7,alex_action_4)
+  , (6,alex_action_5)
+  , (5,alex_action_6)
+  , (4,alex_action_7)
+  , (3,alex_action_8)
+  , (2,alex_action_9)
+  , (1,alex_action_10)
+  , (0,alex_action_11)
   ]
 
-{-# LINE 24 "src/Lexer/lexer.x" #-}
+{-# LINE 26 "src/Lexer/lexer.x" #-}
 
 
 -- The token type:
@@ -2526,6 +2534,8 @@ data Token
   | TokenTimes
   | TokenDiv
   | TokenLambda
+  | TokenLParen
+  | TokenRParen
   | TokenVar String
   deriving (Eq,Show)
 
@@ -2539,7 +2549,9 @@ alex_action_5 =  \s -> TokenMinus
 alex_action_6 =  \s -> TokenTimes 
 alex_action_7 =  \s -> TokenDiv 
 alex_action_8 =  \s -> TokenLambda 
-alex_action_9 =  \s -> TokenVar s 
+alex_action_9 =  \s -> TokenLParen 
+alex_action_10 =  \s -> TokenRParen 
+alex_action_11 =  \s -> TokenVar s 
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- -----------------------------------------------------------------------------
 -- ALEX TEMPLATE
