@@ -11,7 +11,7 @@ import           Data.Maybe
 import           Control.Monad                  ( liftM )
 
 
-type Env = IORef [(String, IORef Exp)]
+type Env = IORef [(String, Exp)]
 
 
 
@@ -62,7 +62,7 @@ eval (Lambda f x) env = do
 eval (App f x) env = do
     Lambda arg body <- getVar f env
     x'              <- eval x env
-    localEnv        <- bindVars [(arg, (Int x'))] env
+    localEnv        <- bindVars [(arg, Int x')] env
     eval body localEnv
 
 
@@ -78,38 +78,18 @@ getVar :: String -> Env -> IO Exp
 getVar var env = do
     e <- readIORef env
     case lookup var e of
-        Just v  -> readIORef v
+        Just v  -> return v
         Nothing -> return (Var "error")
 
 
 envBind :: String -> Exp -> Env -> IO Exp
 envBind var ast env = do
-    hasVar <- isBound var env
-    if hasVar
-        then setVar var ast env >> return ast
-        else do
-            a <- newIORef ast
-            e <- readIORef env
-            writeIORef env ((var, a) : e)
-            return ast
-  where
-    isBound :: String -> Env -> IO Bool
-    isBound var env = isJust . lookup var <$> readIORef env
-
-    setVar :: String -> Exp -> Env -> IO Exp
-    setVar var ast env = do
-        e <- readIORef env
-        case lookup var e of
-            Just v  -> writeIORef v ast
-            Nothing -> return ()
-        return ast
+    e <- readIORef env
+    writeIORef env ((var, ast) : e)
+    return ast
 
 
 bindVars :: [(String, Exp)] -> Env -> IO Env
-bindVars bindings envRef = readIORef envRef >>= extendEnv bindings >>= newIORef
-  where
-    extendEnv bindings env = liftM (++ env) (mapM addBinding bindings)
-    addBinding (var, value) = do
-        ref <- newIORef value
-        return (var, ref)
-
+bindVars bindings envRef = do
+    env <- readIORef envRef
+    newIORef $ (++ env) bindings
