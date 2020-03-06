@@ -35,6 +35,17 @@ eval (Div x1 x2) env = do
     n1 <- eval x1 env
     n2 <- eval x2 env
     return $ n1 `quot` n2
+eval (Bool b) env = do
+    return $ if b then 1 else 0 -- 1==true, 0==false
+eval (Gt x1 x2) env = do
+    n1 <- eval x1 env
+    n2 <- eval x2 env
+    return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false
+eval (If b t e) env = do
+    cond <- eval b env
+    thn  <- eval t env
+    els  <- eval e env
+    return $ if cond == 1 then thn else els
 eval (Var x) env = do
     v <- getVar x env
     eval v env
