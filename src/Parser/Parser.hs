@@ -220,7 +220,7 @@ happyReduction_2 (_ `HappyStk`
 	(HappyTerminal (TokenVar happy_var_1)) `HappyStk`
 	happyRest)
 	 = HappyAbsSyn4
-		 (Call happy_var_1 happy_var_3
+		 (App happy_var_1 happy_var_3
 	) `HappyStk` happyRest
 
 happyReduce_3 = happyReduce 6 4 happyReduction_3

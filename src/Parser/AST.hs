@@ -14,6 +14,6 @@ data Exp
     | Var String
     | Assign String Exp
     | Lambda String Exp
-    | Call String Exp
+    | App String Exp
     | If Exp Exp Exp
     deriving (Eq, Show)

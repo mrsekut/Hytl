@@ -18,7 +18,10 @@ type Env = IORef [(String, IORef Exp)]
 {- Eval -}
 
 eval :: Exp -> Env -> IO Int
-eval (Int n     ) _   = return n
+
+eval (Int  n    ) _   = return n
+eval (Bool b    ) env = return $ if b then 1 else 0 -- 1==true, 0==false
+
 eval (Plus x1 x2) env = do
     n1 <- eval x1 env
     n2 <- eval x2 env
@@ -35,29 +38,31 @@ eval (Div x1 x2) env = do
     n1 <- eval x1 env
     n2 <- eval x2 env
     return $ n1 `quot` n2
-eval (Bool b) env = do
-    return $ if b then 1 else 0 -- 1==true, 0==false
+
 eval (Gt x1 x2) env = do
     n1 <- eval x1 env
     n2 <- eval x2 env
     return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false
+
 eval (If b t e) env = do
     cond <- eval b env
     thn  <- eval t env
     els  <- eval e env
     return $ if cond == 1 then thn else els
-eval (Var x) env = do
-    v <- getVar x env
-    eval v env
+
 eval (Assign v x) env = do
     envBind v x env
     eval x env
+eval (Var x) env = do
+    v <- getVar x env
+    eval v env
 eval (Lambda f x) env = do
     envBind f x env
     eval (Int (-1)) env
-eval (Call f x) env = do
+eval (App f x) env = do
     Lambda arg body <- getVar f env
-    localEnv        <- bindVars [(arg, x)] env
+    x'              <- eval x env
+    localEnv        <- bindVars [(arg, (Int x'))] env
     eval body localEnv
 
 
@@ -107,3 +112,4 @@ bindVars bindings envRef = readIORef envRef >>= extendEnv bindings >>= newIORef
     addBinding (var, value) = do
         ref <- newIORef value
         return (var, ref)
+
