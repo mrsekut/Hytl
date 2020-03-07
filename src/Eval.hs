@@ -46,9 +46,14 @@ eval (Gt x1 x2) env = do
 
 eval (If b t e) env = do
     cond <- eval b env
-    thn  <- eval t env
-    els  <- eval e env
-    return $ if cond == 1 then thn else els
+    if cond == 1
+        then do
+            thn <- eval t env
+            return thn
+        else do
+            els <- eval e env
+            return els
+
 
 eval (Assign v x) env = do
     envBind v x env
@@ -78,6 +83,11 @@ getVar :: String -> Env -> IO Exp
 getVar var env = do
     e <- readIORef env
     case lookup var e of
+        Just (Var v) -> if v == var
+            then do
+                ne <- newIORef (tail e)
+                getVar var ne
+            else return (Var v)
         Just v  -> return v
         Nothing -> return (Var "error")
 
@@ -92,4 +102,4 @@ envBind var ast env = do
 bindVars :: [(String, Exp)] -> Env -> IO Env
 bindVars bindings envRef = do
     env <- readIORef envRef
-    newIORef $ (++ env) bindings
+    newIORef $ bindings ++ env
