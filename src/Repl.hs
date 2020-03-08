@@ -17,7 +17,7 @@ astRepl :: IO ()
 astRepl = repl showAST
   where
     showAST :: String -> String
-    showAST s = (show . parse . lexer) s
+    showAST = show . parse . lexer
 
     repl :: (String -> String) -> IO ()
     repl eval = do
@@ -32,7 +32,7 @@ evalRepl :: IO ()
 evalRepl = replIO showEval =<< emptyEnv
   where
     showEval :: String -> Env -> IO Int
-    showEval s env = eval ((parse . lexer) s) env
+    showEval s = eval ((parse . lexer) s)
 
     replIO :: (String -> Env -> IO Int) -> Env -> IO ()
     replIO eval env = do

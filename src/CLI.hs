@@ -9,7 +9,7 @@ import           Repl                           ( astRepl
 import           Options.Applicative
 
 
-data CLI = CLI { ast :: Bool }
+newtype CLI = CLI { ast :: Bool }
 
 
 cli :: IO ()

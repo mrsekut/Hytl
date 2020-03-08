@@ -46,13 +46,7 @@ eval (Gt x1 x2) env = do
 
 eval (If b t e) env = do
     cond <- eval b env
-    if cond == 1
-        then do
-            thn <- eval t env
-            return thn
-        else do
-            els <- eval e env
-            return els
+    if cond == 1 then eval t env else eval e env
 
 
 eval (Assign v x) env = do
