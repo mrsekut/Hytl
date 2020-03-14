@@ -12,18 +12,24 @@ import           Parser.AST
 import           Data.IORef
 import           Data.Maybe
 import           Control.Monad                  ( liftM )
-import           Control.Monad.State
+import           Control.Monad.Reader           ( ReaderT
+                                                , runReaderT
+                                                , MonadReader
+                                                , ask
+                                                , local
+                                                )
+import           Control.Monad.Trans            ( MonadIO )
 
-
-
+import           Control.Monad.State            ( liftIO )
 
 
 type Env = IORef [(String, Exp)]
-newtype Eval a = Eval (StateT Env IO a)
+newtype Eval a = Eval (ReaderT Env IO a)
     deriving ( Functor
              , Applicative
              , Monad
-             , MonadState Env
+             , MonadReader Env
+             , MonadIO
              )
 
 
@@ -34,10 +40,9 @@ runEval :: Exp -> Env -> IO Int
 runEval exp = runEval' (eval exp)
 
 runEval' :: Eval a -> Env -> IO a
-runEval' (Eval m) env = evalStateT m env
+runEval' (Eval m) env = runReaderT m env
 
 eval :: Exp -> Eval Int
-
 eval (Int  n     ) = return n
 eval (Bool b     ) = return $ if b then 1 else 0 -- 1==true, 0==false
 
@@ -56,18 +61,23 @@ eval (If b t e) = do
     if cond == 1 then eval t else eval e
 
 
--- eval (Assign v x) = envBind v x
--- eval (Var x     ) = do
---     v <- getVar x
---     eval v
--- eval (Lambda f x) env = do
---     envBind f x env
---     eval (Int (-1)) env
--- eval (App f x) env = do
---     Lambda arg body <- getVar f env
---     x'              <- eval x env
---     localEnv        <- bindVars [(arg, Int x')] env
---     eval body localEnv
+eval (Assign v x) = do
+    envBind v x
+    eval x
+eval (Var x) = do
+    v <- getVar x
+    eval v
+eval (Lambda f x) = do
+    envBind f x
+    eval (Int (-1))
+eval (App f x) = do
+    exp <- getVar f
+    case exp of
+        Lambda arg body -> do
+            x' <- eval x
+            bindVars [(arg, Int x')]
+            eval body
+        _ -> return (-1)
 
 
 
@@ -78,26 +88,23 @@ emptyEnv :: IO Env
 emptyEnv = newIORef []
 
 
--- getVar :: String -> Eval Exp
--- getVar var = do
---     e <- get
---     case lookup var e of
---         -- Just (Var v) -> if v == var
---         --     then do
---         --         ne <- newIORef (tail e)
---         --         getVar var ne
---         --     else return (Var v)
---         Just v  -> return v
---         Nothing -> return (Int (length e))
+getVar :: String -> Eval Exp
+getVar var = do
+    env <- ask
+    e   <- liftIO $ readIORef env
+    case lookup var e of
+        Just v  -> return v
+        Nothing -> return (Int (length e))
 
 
--- envBind :: String -> Exp -> Eval Int
--- envBind var ast = do
---     -- modify ((:) (var, ast))
---     -- modify ((:) ("s", (Int 32)))
---     eval ast
+envBind :: String -> Exp -> Eval ()
+envBind var ast = do
+    env <- ask
+    liftIO $ modifyIORef env ((:) (var, ast))
 
--- bindVars :: [(String, Exp)] -> Env -> IO Env
--- bindVars bindings envRef = do
---     env <- readIORef envRef
---     newIORef $ bindings ++ env
+
+bindVars :: [(String, Exp)] -> Eval ()
+bindVars bindings = do
+    env <- ask
+    e   <- liftIO $ readIORef env
+    liftIO $ modifyIORef env ((++) bindings)
