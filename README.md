@@ -1,4 +1,7 @@
-# hytl
+# Hytl
+
+- Hytl lang is mrsekut's original toy programming language.
+- [Docs](https://scrapbox.io/mrsekut-p/Hytl)
 
 ## Build
 
