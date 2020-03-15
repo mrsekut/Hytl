@@ -8,19 +8,48 @@ import           Repl                           ( astRepl
                                                 )
 import           Options.Applicative
 
+import           System.Environment             ( getArgs )
+import           System.FilePath.Posix          ( replaceExtension )
+import qualified Data.Text.IO                  as T
+import qualified Data.Text.Lazy.IO             as LT
+import           Compiler
+import           Data.Text.Internal
+import qualified Data.Text                     as TX
+import           Lexer.Lexer
+import           Parser.Parser
 
-newtype CLI = CLI { ast :: Bool }
+
+data CLI = CLI { ast :: Bool
+               , compile :: FilePath
+               }
 
 
 cli :: IO ()
-cli = astOption =<< execParser opts
+cli = cliOption =<< execParser opts
     where opts = info (config <**> helper) (fullDesc <> progDesc "Hytl REPL")
 
 config :: Parser CLI
 config =
-    CLI <$> switch (long "ast" <> short 'a' <> help "Target for the greeting")
+    CLI
+        <$> switch (long "ast" <> short 'a' <> help "Target for the greeting")
+        <*> strOption
+                (long "compile" <> short 'c' <> metavar "FILENAME" <> help
+                    "Input file"
+                )
 
 
-astOption :: CLI -> IO ()
-astOption (CLI False) = evalRepl
-astOption _           = astRepl
+
+cliOption :: CLI -> IO ()
+cliOption (CLI True  _) = astRepl
+cliOption (CLI False s) = comp s
+cliOption (CLI False _) = evalRepl
+
+
+comp :: FilePath -> IO ()
+comp filePath = do
+    let distPath = replaceExtension filePath ".ll"
+    src <- T.readFile filePath
+    let fs     = TX.head src -- FIXME: \nをlexerで処理できるようにする
+    -- let result = (parse . lexer) fs
+    let result = (parse . lexer) [fs]
+    LT.writeFile distPath (Compiler.compile result)
