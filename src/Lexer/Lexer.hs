@@ -5549,7 +5549,7 @@ alex_actions = array (0 :: Int, 27)
 
 -- The token type:
 data Token
-  = TokenInt Int
+  = TokenInt Integer
   | TokenEq
   | TokenPlus
   | TokenMinus

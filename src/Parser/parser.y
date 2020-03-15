@@ -46,7 +46,7 @@ Exp
 	| Exp '/' Exp						{ Div $1 $3 }
 	| Exp '>' Exp						{ Gt $1 $3 }
 	| var "=>" Exp						{ Lambda $1 $3 }
-	| int								{ Int $1 }
+	| int								{ Nat $1 }
 	| var								{ Var $1 }
 	| bool								{ Bool $1 }
 

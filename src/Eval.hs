@@ -34,8 +34,8 @@ newtype Eval a = Eval (ReaderT Env IO a)
 
 {- Eval -}
 
-eval :: Exp -> Eval Int
-eval (Int  n     ) = return n
+eval :: Exp -> Eval Integer
+eval (Nat  n     ) = return n
 eval (Bool b     ) = return $ if b then 1 else 0 -- 1==true, 0==false
 
 eval (Plus  x1 x2) = (+) <$> eval x1 <*> eval x2
@@ -60,13 +60,13 @@ eval (Var x) = do
     eval v
 eval (Lambda arg body) = do
     envBind arg body
-    eval (Int (-1))
+    eval (Nat (-1))
 eval (App f x) = do
     exp <- getVar f
     case exp of
         Lambda arg body -> do
             x' <- eval x
-            bindVars [(arg, Int x')]
+            bindVars [(arg, Nat x')]
             eval body
         _ -> return (-1)
 
@@ -88,7 +88,7 @@ getVar var = do
     e   <- liftIO $ readIORef env
     case lookup var e of
         Just v  -> return v
-        Nothing -> return (Int (length e))
+        Nothing -> return (Nat $ (toInteger . length) e)
 
 
 envBind :: String -> Exp -> Eval ()

@@ -21,9 +21,12 @@ description: Please see the README on GitHub at <https://github.com/githubuser/h
 
 dependencies:
   - base >= 4.7 && < 5
+  - text == 1.2.3.1
   - array
   - optparse-applicative
   - mtl
+  - llvm-hs-pure == 9.0.0
+  - llvm-hs-pretty == 0.6.2.0
 
 library:
   source-dirs: src

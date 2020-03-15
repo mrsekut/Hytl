@@ -4,7 +4,7 @@ module Parser.AST
 where
 
 data Exp
-    = Int Int
+    = Nat Integer
     | Bool Bool
     | Plus Exp Exp
     | Minus Exp Exp

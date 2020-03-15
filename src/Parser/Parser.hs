@@ -292,7 +292,7 @@ happyReduction_9 _ _ _  = notHappyAtAll
 happyReduce_10 = happySpecReduce_1  4 happyReduction_10
 happyReduction_10 (HappyTerminal (TokenInt happy_var_1))
 	 =  HappyAbsSyn4
-		 (Int happy_var_1
+		 (Nat happy_var_1
 	)
 happyReduction_10 _  = notHappyAtAll 
 

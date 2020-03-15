@@ -34,7 +34,7 @@ tokens :-
 
 -- The token type:
 data Token
-  = TokenInt Int
+  = TokenInt Integer
   | TokenEq
   | TokenPlus
   | TokenMinus

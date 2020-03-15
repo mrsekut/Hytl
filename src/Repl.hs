@@ -31,10 +31,10 @@ astRepl = repl showAST
 evalRepl :: IO ()
 evalRepl = replIO showEval =<< emptyEnv
   where
-    showEval :: String -> Env -> IO Int
+    showEval :: String -> Env -> IO Integer
     showEval s = runEval $ eval ((parse . lexer) s)
 
-    replIO :: (String -> Env -> IO Int) -> Env -> IO ()
+    replIO :: (String -> Env -> IO Integer) -> Env -> IO ()
     replIO eval env = do
         input <- read_
         unless (input == ":quit") $ do
