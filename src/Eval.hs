@@ -12,15 +12,12 @@ where
 import           Parser.AST
 import           Data.IORef
 import           Data.Maybe
-import           Control.Monad                  ( liftM )
 import           Control.Monad.Reader           ( ReaderT
                                                 , runReaderT
                                                 , MonadReader
                                                 , ask
-                                                , local
                                                 )
 import           Control.Monad.Trans            ( MonadIO )
-
 import           Control.Monad.State            ( liftIO )
 
 
@@ -55,7 +52,6 @@ eval (If b t e) = do
     cond <- eval b
     if cond == 1 then eval t else eval e
 
-
 eval (Assign v x) = do
     envBind v x
     eval x
@@ -79,7 +75,8 @@ eval (App f x) = do
 {- Utils -}
 
 runEval :: Eval a -> Env -> IO a
-runEval (Eval m) env = runReaderT m env
+runEval (Eval m) = runReaderT m
+
 
 emptyEnv :: IO Env
 emptyEnv = newIORef []
