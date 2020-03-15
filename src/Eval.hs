@@ -3,8 +3,9 @@
 module Eval
     ( eval
     , emptyEnv
-    , runEval
     , Env
+    , Eval
+    , runEval
     )
 where
 
@@ -36,12 +37,6 @@ newtype Eval a = Eval (ReaderT Env IO a)
 
 {- Eval -}
 
-runEval :: Exp -> Env -> IO Int
-runEval exp = runEval' (eval exp)
-
-runEval' :: Eval a -> Env -> IO a
-runEval' (Eval m) env = runReaderT m env
-
 eval :: Exp -> Eval Int
 eval (Int  n     ) = return n
 eval (Bool b     ) = return $ if b then 1 else 0 -- 1==true, 0==false
@@ -67,8 +62,8 @@ eval (Assign v x) = do
 eval (Var x) = do
     v <- getVar x
     eval v
-eval (Lambda f x) = do
-    envBind f x
+eval (Lambda arg body) = do
+    envBind arg body
     eval (Int (-1))
 eval (App f x) = do
     exp <- getVar f
@@ -83,6 +78,8 @@ eval (App f x) = do
 
 {- Utils -}
 
+runEval :: Eval a -> Env -> IO a
+runEval (Eval m) env = runReaderT m env
 
 emptyEnv :: IO Env
 emptyEnv = newIORef []

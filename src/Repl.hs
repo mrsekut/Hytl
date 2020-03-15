@@ -32,7 +32,7 @@ evalRepl :: IO ()
 evalRepl = replIO showEval =<< emptyEnv
   where
     showEval :: String -> Env -> IO Int
-    showEval s = runEval ((parse . lexer) s)
+    showEval s = runEval $ eval ((parse . lexer) s)
 
     replIO :: (String -> Env -> IO Int) -> Env -> IO ()
     replIO eval env = do
