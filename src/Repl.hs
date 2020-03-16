@@ -1,7 +1,7 @@
 module Repl
-    ( astRepl
-    , evalRepl
-    )
+  ( astRepl
+  , evalRepl
+  )
 where
 
 
@@ -12,43 +12,46 @@ import           System.IO
 import           Control.Monad                  ( unless )
 
 
--- ast mode
+{- AST mode -}
+
 astRepl :: IO ()
 astRepl = repl showAST
-  where
-    showAST :: String -> String
-    showAST = show . parse . lexer
+ where
+  showAST :: String -> String
+  showAST = show . parse . lexer
 
-    repl :: (String -> String) -> IO ()
-    repl eval = do
-        input <- read_
-        unless (input == ":quit") $ print_ (eval input) >> repl eval
-
-
+  repl :: (String -> String) -> IO ()
+  repl eval = do
+    input <- read_
+    unless (input == ":quit") $ print_ (eval input) >> repl eval
 
 
--- eval mode
+
+
+{- Eval mode -}
+
 evalRepl :: IO ()
 evalRepl = replIO showEval =<< emptyEnv
-  where
-    showEval :: String -> Env -> IO Integer
-    showEval s = runEval $ eval ((parse . lexer) s)
+ where
+  showEval :: String -> Env -> IO Integer
+  showEval s = runEval $ eval ((parse . lexer) s)
 
-    replIO :: (String -> Env -> IO Integer) -> Env -> IO ()
-    replIO eval env = do
-        input <- read_
-        unless (input == ":quit") $ do
-            value <- eval input env
-            print_ $ show value
-            replIO eval env
+  replIO :: (String -> Env -> IO Integer) -> Env -> IO ()
+  replIO eval env = do
+    input <- read_
+    unless (input == ":quit") $ do
+      value <- eval input env
+      print_ $ show value
+      replIO eval env
 
 
--- utils
+{- Utils -}
+
 read_ :: IO String
 read_ = do
-    putStr "hytl> "
-    hFlush stdout
-    getLine
+  putStr "hytl> "
+  hFlush stdout
+  getLine
 
 print_ :: String -> IO ()
 print_ = putStrLn

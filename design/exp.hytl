@@ -1,0 +1,23 @@
+3 + 3
+3 - 2
+3 * 4
+9 / 3
+9 % 3
+3 ^ 2
+
+hoge ::= Int
+hoge := 3
+
+// 無名関数
+mod ::= Int Int -> Int
+mod := x n => x % n
+mod := x => n => x % n
+
+
+fn add3 x = x + 3
+
+
+fn fib = match
+    0 => 0
+    1 => 1
+    n => fib n-1 + fib n-2

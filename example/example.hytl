@@ -1,2 +1,0 @@
-fac = n => if n > 1 then n * fac (n - 1) else 1
-fac(5) // 120

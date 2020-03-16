@@ -5,7 +5,7 @@
 
 ## Build
 
-`$ ./run.sh`
+`$ ./build.sh`
 
 ## Run
 

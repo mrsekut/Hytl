@@ -1,12 +1,12 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Eval
-    ( eval
-    , emptyEnv
-    , Env
-    , Eval
-    , runEval
-    )
+  ( eval
+  , emptyEnv
+  , Env
+  , Eval
+  , runEval
+  )
 where
 
 import           Parser.AST
@@ -44,31 +44,31 @@ eval (Times x1 x2) = (*) <$> eval x1 <*> eval x2
 eval (Div   x1 x2) = quot <$> eval x1 <*> eval x2
 
 eval (Gt    x1 x2) = do
-    n1 <- eval x1
-    n2 <- eval x2
-    return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false
+  n1 <- eval x1
+  n2 <- eval x2
+  return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false
 
 eval (If b t e) = do
-    cond <- eval b
-    if cond == 1 then eval t else eval e
+  cond <- eval b
+  if cond == 1 then eval t else eval e
 
 eval (Assign v x) = do
-    envBind v x
-    eval x
+  envBind v x
+  eval x
 eval (Var x) = do
-    v <- getVar x
-    eval v
+  v <- getVar x
+  eval v
 eval (Lambda arg body) = do
-    envBind arg body
-    eval (Nat (-1))
+  envBind arg body
+  eval (Nat (-1))
 eval (App f x) = do
-    exp <- getVar f
-    case exp of
-        Lambda arg body -> do
-            x' <- eval x
-            bindVars [(arg, Nat x')]
-            eval body
-        _ -> return (-1)
+  exp <- getVar f
+  case exp of
+    Lambda arg body -> do
+      x' <- eval x
+      bindVars [(arg, Nat x')]
+      eval body
+    _ -> return (-1)
 
 
 
@@ -84,21 +84,21 @@ emptyEnv = newIORef []
 
 getVar :: String -> Eval Exp
 getVar var = do
-    env <- ask
-    e   <- liftIO $ readIORef env
-    case lookup var e of
-        Just v  -> return v
-        Nothing -> return (Nat $ (toInteger . length) e)
+  env <- ask
+  e   <- liftIO $ readIORef env
+  case lookup var e of
+    Just v  -> return v
+    Nothing -> return (Nat $ (toInteger . length) e)
 
 
 envBind :: String -> Exp -> Eval ()
 envBind var ast = do
-    env <- ask
-    liftIO $ modifyIORef env ((:) (var, ast))
+  env <- ask
+  liftIO $ modifyIORef env ((:) (var, ast))
 
 
 bindVars :: [(String, Exp)] -> Eval ()
 bindVars bindings = do
-    env <- ask
-    e   <- liftIO $ readIORef env
-    liftIO $ modifyIORef env ((++) bindings)
+  env <- ask
+  e   <- liftIO $ readIORef env
+  liftIO $ modifyIORef env ((++) bindings)

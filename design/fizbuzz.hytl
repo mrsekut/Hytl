@@ -1,0 +1,20 @@
+// 型の明示が実装に組み込まれるのは微妙だと思う
+// それと、この書き方はすぐネストが深くなっていきそう
+fizzbuzz n:= Int -> String
+    match mod n
+        15 => "fizzbuzz"
+        3  => "fizz"
+        5  => "buzz"
+        n  => String n
+
+
+
+mod n d = n % d
+mod5 n = n % d
+
+fizzbuzz = match mod5
+    15 => "fizzbuzz"
+    3  => "fizz"
+    5  => "buzz"
+    n  => String n
+

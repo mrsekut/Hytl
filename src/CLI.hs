@@ -1,6 +1,6 @@
 module CLI
-    ( cli
-    )
+  ( cli
+  )
 where
 
 import           Repl                           ( astRepl
@@ -26,30 +26,28 @@ data CLI = CLI { ast :: Bool
 
 cli :: IO ()
 cli = cliOption =<< execParser opts
-    where opts = info (config <**> helper) (fullDesc <> progDesc "Hytl REPL")
+  where opts = info (config <**> helper) (fullDesc <> progDesc "Hytl REPL")
 
 config :: Parser CLI
 config =
-    CLI
-        <$> switch (long "ast" <> short 'a' <> help "Target for the greeting")
-        <*> strOption
-                (long "compile" <> short 'c' <> metavar "FILENAME" <> help
-                    "Input file"
-                )
-
+  CLI
+    <$> switch (long "ast" <> short 'a' <> help "Target for the greeting")
+    <*> strOption
+          (long "compile" <> short 'c' <> metavar "FILENAME" <> help
+            "Input file"
+          )
 
 
 cliOption :: CLI -> IO ()
 cliOption (CLI True  _) = astRepl
-cliOption (CLI False s) = comp s
+cliOption (CLI False s) = compileFile s
 cliOption (CLI False _) = evalRepl
 
 
-comp :: FilePath -> IO ()
-comp filePath = do
-    let distPath = replaceExtension filePath ".ll"
-    src <- T.readFile filePath
-    let fs     = TX.head src -- FIXME: \nをlexerで処理できるようにする
-    -- let result = (parse . lexer) fs
-    let result = (parse . lexer) [fs]
-    LT.writeFile distPath (Compiler.compile result)
+compileFile :: FilePath -> IO ()
+compileFile filePath = do
+  let distPath = replaceExtension filePath ".ll"
+  src <- T.readFile filePath
+  let fs     = [TX.head src]-- FIXME: \nをlexerで処理できるようにする
+  let result = (parse . lexer) fs
+  LT.writeFile distPath (Compiler.compile result)

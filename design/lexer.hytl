@@ -1,0 +1,8 @@
+type Token = [String]
+
+lexer ::= String -> [Token]
+lexer := s =>
+    match s
+        isOp x => lexOp x
+        isNum x => lexNum x
+        _       => lexer x

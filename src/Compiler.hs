@@ -20,22 +20,23 @@ import qualified Parser.AST                    as AST
 
 type LLVMBuilder = IRBuilderT (ModuleBuilderT Identity)
 
+
 compile :: AST.Exp -> Text
 compile expr = ppllvm $ buildModule "main" $ do
-    form   <- globalStringPtr "%d\n" "putNumForm"
-    printf <- externVarArgs "printf" [ptr i8] i32
-    function "main" [] i32 $ \[] -> do
-        entry <- block `named` "entry"
-        do
-            r <- toOperand expr
-            call printf [(ConstantOperand form, []), (r, [])]
-            ret (int32 0)
+  form   <- globalStringPtr "%d\n" "putNumForm"
+  printf <- externVarArgs "printf" [ptr i8] i32
+  function "main" [] i32 $ \[] -> do
+    entry <- block `named` "entry"
+    do
+      r <- toOperand expr
+      call printf [(ConstantOperand form, []), (r, [])]
+      ret (int32 0)
 
 class LLVMOperand a where
   toOperand :: a -> LLVMBuilder Operand
 
 instance LLVMOperand AST.Exp where
-    toOperand (AST.Nat n) = return (int32 n)
+  toOperand (AST.Nat n) = return (int32 n)
     -- toOperand (AST.ExprTerm e      ) = toOperand e
     -- toOperand (AST.Expr t AST.Add e) = do
     --     t' <- toOperand t
