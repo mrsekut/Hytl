@@ -36,12 +36,13 @@ class LLVMOperand a where
   toOperand :: a -> LLVMBuilder Operand
 
 instance LLVMOperand AST.Exp where
-  toOperand (AST.Nat n) = return (int32 n)
-    -- toOperand (AST.ExprTerm e      ) = toOperand e
-    -- toOperand (AST.Expr t AST.Add e) = do
-    --     t' <- toOperand t
-    --     e' <- toOperand e
-    --     add t' e'
+  toOperand (AST.Nat n     ) = return (int32 n)
+-- toOperand (AST.Bool e) = toOperand e
+
+  toOperand (AST.Plus x1 x2) = do
+    x1' <- toOperand x1
+    x2'  <- toOperand x2
+    add x1' x2'
     -- toOperand (AST.Expr t AST.Sub e) = do
     --     t' <- toOperand t
     --     e' <- toOperand e

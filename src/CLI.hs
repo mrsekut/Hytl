@@ -10,11 +10,11 @@ import           Options.Applicative
 
 import           System.Environment             ( getArgs )
 import           System.FilePath.Posix          ( replaceExtension )
-import qualified Data.Text.IO                  as T
+import qualified Data.Text.IO                  as TIO
 import qualified Data.Text.Lazy.IO             as LT
+import qualified Data.Text                     as T
 import           Compiler
 import           Data.Text.Internal
-import qualified Data.Text                     as TX
 import           Lexer.Lexer
 import           Parser.Parser
 
@@ -39,15 +39,14 @@ config =
 
 
 cliOption :: CLI -> IO ()
-cliOption (CLI True  _) = astRepl
+-- cliOption (CLI True _) = astRepl
 cliOption (CLI False s) = compileFile s
-cliOption (CLI False _) = evalRepl
+-- cliOption (CLI False _) = evalRepl
 
 
 compileFile :: FilePath -> IO ()
 compileFile filePath = do
   let distPath = replaceExtension filePath ".ll"
-  src <- T.readFile filePath
-  let fs     = [TX.head src]-- FIXME: \nをlexerで処理できるようにする
-  let result = (parse . lexer) fs
+  src <- TIO.readFile filePath
+  let result = (parse . lexer . T.unpack) src
   LT.writeFile distPath (Compiler.compile result)

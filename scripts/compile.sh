@@ -5,17 +5,22 @@ if [ $# -ne 1 ]; then
     echo "!!! Please specify an argument !!!"
 fi
 
-echo $1 >>./examples/try.hytl
-echo "maked ./examples/try.hytl"
+printf $1 >./examples/tmp/tmp.hytl
+echo ""
+echo "maked ./examples/tmp/tmp.hytl"
 
-stack exec -- hytl-exe -c examples/ex1.hytl
-echo "compiled to ./examples/try.ll"
+stack exec -- hytl-exe -c examples/tmp/tmp.hytl
+echo ""
+echo "compiled to ./examples/tmp/tmp.ll"
 
-llc examples/ex1.ll
-echo "compiled to ./examples/try.s"
+/usr/local/opt/llvm/bin/llc examples/tmp/tmp.ll
+echo ""
+echo "compiled to ./examples/tmp/tmp.s"
 
-gcc examples/ex1.s -o examples/ex1
-echo "compiled to ./examples/try"
+gcc examples/tmp/tmp.s -o examples/tmp/tmp
+echo ""
+echo "compiled to ./examples/tmp/tmp"
 
+echo ""
 echo "-- result ---"
-./examples/ex1
+./examples/tmp/tmp
