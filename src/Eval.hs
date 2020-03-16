@@ -35,15 +35,15 @@ newtype Eval a = Eval (ReaderT Env IO a)
 {- Eval -}
 
 eval :: Exp -> Eval Integer
-eval (Nat  n     ) = return n
-eval (Bool b     ) = return $ if b then 1 else 0 -- 1==true, 0==false
+eval (Nat  n   ) = return n
+eval (Bool b   ) = return $ if b then 1 else 0 -- 1==true, 0==false
 
-eval (Plus  x1 x2) = (+) <$> eval x1 <*> eval x2
-eval (Minus x1 x2) = (-) <$> eval x1 <*> eval x2
-eval (Times x1 x2) = (*) <$> eval x1 <*> eval x2
-eval (Div   x1 x2) = quot <$> eval x1 <*> eval x2
+eval (Add x1 x2) = (+) <$> eval x1 <*> eval x2
+eval (Sub x1 x2) = (-) <$> eval x1 <*> eval x2
+eval (Mul x1 x2) = (*) <$> eval x1 <*> eval x2
+eval (Div x1 x2) = quot <$> eval x1 <*> eval x2
 
-eval (Gt    x1 x2) = do
+eval (Gt  x1 x2) = do
   n1 <- eval x1
   n2 <- eval x2
   return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false

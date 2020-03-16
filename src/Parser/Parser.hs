@@ -240,7 +240,7 @@ happyReduction_4 (HappyAbsSyn4  happy_var_3)
 	_
 	(HappyAbsSyn4  happy_var_1)
 	 =  HappyAbsSyn4
-		 (Plus happy_var_1 happy_var_3
+		 (Add happy_var_1 happy_var_3
 	)
 happyReduction_4 _ _ _  = notHappyAtAll 
 
@@ -249,7 +249,7 @@ happyReduction_5 (HappyAbsSyn4  happy_var_3)
 	_
 	(HappyAbsSyn4  happy_var_1)
 	 =  HappyAbsSyn4
-		 (Minus happy_var_1 happy_var_3
+		 (Sub happy_var_1 happy_var_3
 	)
 happyReduction_5 _ _ _  = notHappyAtAll 
 
@@ -258,7 +258,7 @@ happyReduction_6 (HappyAbsSyn4  happy_var_3)
 	_
 	(HappyAbsSyn4  happy_var_1)
 	 =  HappyAbsSyn4
-		 (Times happy_var_1 happy_var_3
+		 (Mul happy_var_1 happy_var_3
 	)
 happyReduction_6 _ _ _  = notHappyAtAll 
 

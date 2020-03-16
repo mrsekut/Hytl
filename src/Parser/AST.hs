@@ -6,9 +6,9 @@ where
 data Exp
     = Nat Integer
     | Bool Bool
-    | Plus Exp Exp
-    | Minus Exp Exp
-    | Times Exp Exp
+    | Add Exp Exp
+    | Sub Exp Exp
+    | Mul Exp Exp
     | Div Exp Exp
     | Gt Exp Exp
     | Var String

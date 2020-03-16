@@ -40,9 +40,9 @@ Exp
 	: var '=' Exp						{ Assign $1 $3 }
 	| var '(' Exp ')'					{ App $1 $3 }
 	| "if" Exp "then" Exp "else" Exp	{ If $2 $4 $6 }
-	| Exp '+' Exp						{ Plus $1 $3 }
-	| Exp '-' Exp						{ Minus $1 $3 }
-	| Exp '*' Exp						{ Times $1 $3 }
+	| Exp '+' Exp						{ Add $1 $3 }
+	| Exp '-' Exp						{ Sub $1 $3 }
+	| Exp '*' Exp						{ Mul $1 $3 }
 	| Exp '/' Exp						{ Div $1 $3 }
 	| Exp '>' Exp						{ Gt $1 $3 }
 	| var "=>" Exp						{ Lambda $1 $3 }

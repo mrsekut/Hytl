@@ -5544,7 +5544,7 @@ alex_actions = array (0 :: Int, 27)
   , (0,alex_action_16)
   ]
 
-{-# LINE 34 "src/Lexer/lexer.x" #-}
+{-# LINE 33 "src/Lexer/lexer.x" #-}
 
 
 -- The token type:
