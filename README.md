@@ -9,14 +9,14 @@
 
 ## Run
 
-`$ stack exec -- hytl-exe`
+`$ stack exec -- hytl-exe repl`
 
 - ex. `> 1+1`
 - out. `2`
 
 ### AST Mode
 
-`$ stack exec -- hytl-exe -a`
+`$ stack exec -- hytl-exe repl -a`
 
 - ex. `> 1+1`
 - out. `Plus (Int 2) (Int 3)`

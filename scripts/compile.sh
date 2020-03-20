@@ -9,7 +9,7 @@ printf $1 >./examples/tmp/tmp.hytl
 echo ""
 echo "maked ./examples/tmp/tmp.hytl"
 
-stack exec -- hytl-exe -c examples/tmp/tmp.hytl
+stack exec -- hytl-exe compile examples/tmp/tmp.hytl
 echo ""
 echo "compiled to ./examples/tmp/tmp.ll"
 

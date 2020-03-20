@@ -8,41 +8,57 @@ import           Repl                           ( astRepl
                                                 )
 import           Options.Applicative
 
-import           System.Environment             ( getArgs )
 import           System.FilePath.Posix          ( replaceExtension )
 import qualified Data.Text.IO                  as TIO
 import qualified Data.Text.Lazy.IO             as LT
 import qualified Data.Text                     as T
 import           Compiler
-import           Data.Text.Internal
 import           Lexer.Lexer
 import           Parser.Parser
 
 
-data CLI = CLI { ast :: Bool
-               , compile :: FilePath
-               }
+data Command = Repl Bool | Compiler FilePath
 
+
+
+{- CLI -}
 
 cli :: IO ()
-cli = cliOption =<< execParser opts
-  where opts = info (config <**> helper) (fullDesc <> progDesc "Hytl REPL")
+cli = cliOption =<< execParser parseInfo
+ where
+  cliOption :: Command -> IO ()
+  cliOption cmd = case cmd of
+    Repl     True     -> astRepl
+    Repl     False    -> evalRepl
+    Compiler filepath -> compileFile filepath
 
-config :: Parser CLI
-config =
-  CLI
-    <$> switch (long "ast" <> short 'a' <> help "Target for the greeting")
-    <*> strOption
-          (long "compile" <> short 'c' <> metavar "FILENAME" <> help
-            "Input file"
-          )
+  parseInfo :: ParserInfo Command
+  parseInfo = parseCommand `withInfo` "Hello Hytl"
+
+  parseCommand :: Parser Command
+  parseCommand =
+    subparser
+      $  command "repl"    (replP `withInfo` "Start repl in the interpreter")
+      <> command "compile" (compileP `withInfo` "Compile Hytl code")
+
+  withInfo :: Parser a -> String -> ParserInfo a
+  withInfo opts desc = info (helper <*> opts) $ progDesc desc
 
 
-cliOption :: CLI -> IO ()
--- cliOption (CLI True _) = astRepl
-cliOption (CLI False s) = compileFile s
--- cliOption (CLI False _) = evalRepl
 
+{- Sub Command -}
+
+replP :: Parser Command
+replP = Repl <$> switch
+  (long "ast" <> short 'a' <> help "Start the interpreter that outputs AST")
+
+compileP :: Parser Command
+compileP =
+  Compiler <$> argument str (metavar "[FILENAME]" <> help "Input `.hytl` file")
+
+
+
+{- compile -}
 
 compileFile :: FilePath -> IO ()
 compileFile filePath = do
@@ -50,3 +66,4 @@ compileFile filePath = do
   src <- TIO.readFile filePath
   let result = (parse . lexer . T.unpack) src
   LT.writeFile distPath (Compiler.compile result)
+
