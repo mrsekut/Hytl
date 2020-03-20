@@ -16,16 +16,23 @@ tokens :-
   "--".*                            ;
   $digit+                           { \s -> TokenInt (read s) }
   @bool                             { \b -> TokenBool (if b == "true" then True else False) }
+
   \=                                { \s -> TokenAssign }
+  \=>                               { \s -> TokenLambda }
+
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
   \*                                { \s -> TokenTimes }
   \/                                { \s -> TokenDiv }
-  \=>                               { \s -> TokenLambda }
-  \==                               { \s -> TokenEq }
+
   \(                                { \s -> TokenLParen }
   \)                                { \s -> TokenRParen }
+  \==                               { \s -> TokenEq }
   \>                                { \s -> TokenGT }
+  \>=                               { \s -> TokenGE }
+  \<                                { \s -> TokenLT }
+  \<=                               { \s -> TokenLE }
+
   if                                { \s -> TokenIf }
   then                              { \s -> TokenThen }
   else                              { \s -> TokenElse }
@@ -37,15 +44,21 @@ tokens :-
 data Token
   = TokenInt Integer
   | TokenAssign
+  | TokenLambda
+
   | TokenPlus
   | TokenMinus
   | TokenTimes
   | TokenDiv
-  | TokenLambda
+
   | TokenLParen
   | TokenRParen
   | TokenEq
   | TokenGT
+  | TokenGE
+  | TokenLT
+  | TokenLE
+
   | TokenIf
   | TokenThen
   | TokenElse

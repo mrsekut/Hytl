@@ -47,10 +47,22 @@ eval (Eq  x1 x2) = do
   n1 <- eval x1
   n2 <- eval x2
   return $ if n1 == n2 then 1 else 0 -- 1==true, 0==false
-eval (Gt  x1 x2) = do
+eval (Gt x1 x2) = do
   n1 <- eval x1
   n2 <- eval x2
   return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false
+eval (Ge x1 x2) = do
+  n1 <- eval x1
+  n2 <- eval x2
+  return $ if n1 >= n2 then 1 else 0 -- 1==true, 0==false
+eval (Lt x1 x2) = do
+  n1 <- eval x1
+  n2 <- eval x2
+  return $ if n1 < n2 then 1 else 0 -- 1==true, 0==false
+eval (Le x1 x2) = do
+  n1 <- eval x1
+  n2 <- eval x2
+  return $ if n1 <= n2 then 1 else 0 -- 1==true, 0==false
 
 eval (If b t e) = do
   cond <- eval b
