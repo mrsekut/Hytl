@@ -43,6 +43,10 @@ eval (Sub x1 x2) = (-) <$> eval x1 <*> eval x2
 eval (Mul x1 x2) = (*) <$> eval x1 <*> eval x2
 eval (Div x1 x2) = quot <$> eval x1 <*> eval x2
 
+eval (Eq  x1 x2) = do
+  n1 <- eval x1
+  n2 <- eval x2
+  return $ if n1 == n2 then 1 else 0 -- 1==true, 0==false
 eval (Gt  x1 x2) = do
   n1 <- eval x1
   n2 <- eval x2

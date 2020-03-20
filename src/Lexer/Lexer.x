@@ -16,12 +16,13 @@ tokens :-
   "--".*                            ;
   $digit+                           { \s -> TokenInt (read s) }
   @bool                             { \b -> TokenBool (if b == "true" then True else False) }
-  \=                                { \s -> TokenEq}
+  \=                                { \s -> TokenAssign }
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
   \*                                { \s -> TokenTimes }
   \/                                { \s -> TokenDiv }
   \=>                               { \s -> TokenLambda }
+  \==                               { \s -> TokenEq }
   \(                                { \s -> TokenLParen }
   \)                                { \s -> TokenRParen }
   \>                                { \s -> TokenGT }
@@ -35,7 +36,7 @@ tokens :-
 -- The token type:
 data Token
   = TokenInt Integer
-  | TokenEq
+  | TokenAssign
   | TokenPlus
   | TokenMinus
   | TokenTimes
@@ -43,6 +44,7 @@ data Token
   | TokenLambda
   | TokenLParen
   | TokenRParen
+  | TokenEq
   | TokenGT
   | TokenIf
   | TokenThen

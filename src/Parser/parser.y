@@ -17,8 +17,9 @@ import Lexer.Lexer (Token(..))
 	'-'				{ TokenMinus }
 	'*'				{ TokenTimes }
 	'/'				{ TokenDiv }
-	'='				{ TokenEq }
+	'='				{ TokenAssign  }
 	"=>"			{ TokenLambda }
+	"=="			{ TokenEq }
 	'('				{ TokenLParen }
 	')'				{ TokenRParen }
 	"if"			{ TokenIf }
@@ -30,7 +31,7 @@ import Lexer.Lexer (Token(..))
 %right '='
 %left "=>"
 %left "if" "then" "else"
-%left '>'
+%left '>' "=="
 %left '+' '-'
 %left '*' '/'
 
@@ -46,6 +47,7 @@ Exp
 	| Exp '/' Exp						{ Div $1 $3 }
 	| Exp '>' Exp						{ Gt $1 $3 }
 	| var "=>" Exp						{ Lambda $1 $3 }
+	| Exp "==" Exp						{ Eq $1 $3 }
 	| int								{ Nat $1 }
 	| var								{ Var $1 }
 	| bool								{ Bool $1 }

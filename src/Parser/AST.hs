@@ -11,6 +11,7 @@ data Exp
     | Mul Exp Exp
     | Div Exp Exp
     | Gt Exp Exp
+    | Eq Exp Exp
     | Var String
     | Assign String Exp
     | Lambda String Exp
