@@ -1,11 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecursiveDo #-}
 
 module Compiler where
 
 import           Data.Text.Internal.Lazy
 import           Data.Functor.Identity
-import           Data.Map
-import           Control.Monad.State
+import qualified Data.Map                      as M
+import           Control.Monad.State     hiding ( void )
+import           Data.Maybe
 
 import           LLVM.Pretty
 import           LLVM.AST                hiding ( function
@@ -21,7 +23,7 @@ import           LLVM.IRBuilder.Constant
 import qualified Parser.AST                    as AST
 
 
-data GenState = GenState { table :: Map String Operand}
+data GenState = GenState { table :: M.Map String AST.Exp}
 type CodeGen a = IRBuilderT GenDec a
 type GenDec = ModuleBuilderT (State GenState)
 
@@ -29,7 +31,7 @@ type GenDec = ModuleBuilderT (State GenState)
 
 compile :: AST.Exp -> Text
 compile expr = ppllvm $ evalState
-  (buildModuleT "main" $ function "main" [] i32 $ \_ -> do
+  (buildModuleT "main" $ function "main" [] i32 $ \_ -> mdo
     r <- toOperand expr
     printf r
     ret (int32 0)
@@ -42,12 +44,8 @@ compile expr = ppllvm $ evalState
     call printf [(ConstantOperand form, []), (r, [])]
 
 
-run :: CodeGen a -> IRBuilderT (ModuleBuilderT Identity) a
-run r = do
-  undefined
-
 emptyCodegen :: GenState
-emptyCodegen = GenState $ fromList []
+emptyCodegen = GenState $ M.fromList []
 
 
 class LLVMOperand a where
@@ -56,29 +54,30 @@ class LLVMOperand a where
 instance LLVMOperand AST.Exp where
   toOperand (AST.Nat n    ) = return (int32 n)
 
-  toOperand (AST.Add x1 x2) = do
+  toOperand (AST.Add x1 x2) = mdo
     x1' <- toOperand x1
     x2' <- toOperand x2
     add x1' x2'
-  toOperand (AST.Sub x1 x2) = do
+  toOperand (AST.Sub x1 x2) = mdo
     x1' <- toOperand x1
     x2' <- toOperand x2
     sub x1' x2'
-  toOperand (AST.Mul x1 x2) = do
+  toOperand (AST.Mul x1 x2) = mdo
     x1' <- toOperand x1
     x2' <- toOperand x2
     mul x1' x2'
-  toOperand (AST.Div x1 x2) = do
+  toOperand (AST.Div x1 x2) = mdo
     x1' <- toOperand x1
     x2' <- toOperand x2
     sdiv x1' x2'
 
-  -- toOperand (AST.Assign s exp) = do
-  --   op <- toOperand exp
-  --   let li = fromList [("x", op)]
-  --   modify (\s -> s { table = li })
-  --   pure $ int32 1
-
+  toOperand (AST.Assign s exp) = mdo
+    let li = M.fromList [(s, exp)]
+    modify (\s -> s { table = li })
+    toOperand exp
+  toOperand (AST.Var x) = mdo
+    a <- get
+    toOperand $ fromJust $ M.lookup x $ table a
 
 -- addTable :: (MonadState GenState m, MonadTrans t) => String -> Operand -> t m ()
 -- addTable name opr = lift (modify (\s -> s { table = set name opr }))
