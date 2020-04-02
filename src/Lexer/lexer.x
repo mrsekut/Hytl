@@ -7,6 +7,7 @@ module Lexer.Lexer (lexer, Token(..)) where
 
 $digit = 0-9
 $alpha = [a-zA-Z]
+$semi = \;
 
 @bool = (true) | (false)
 
@@ -16,6 +17,7 @@ tokens :-
   "--".*                            ;
   $digit+                           { \s -> TokenInt (read s) }
   @bool                             { \b -> TokenBool (if b == "true" then True else False) }
+  $semi                             { \s -> TokenSemicolon }
 
   \=                                { \s -> TokenAssign }
   \=>                               { \s -> TokenLambda }
@@ -64,6 +66,7 @@ data Token
   | TokenElse
   | TokenVar String
   | TokenBool Bool
+  | TokenSemicolon
   deriving (Eq,Show)
 
 lexer = alexScanTokens

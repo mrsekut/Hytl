@@ -32,15 +32,15 @@ type GenDec = ModuleBuilderT (State GenState)
 compile :: AST.Program -> Text
 compile expr = ppllvm $ evalState
   (buildModuleT "main" $ function "main" [] i32 $ \_ -> mdo
+    form     <- globalStringPtr "%d\n" "putNumForm"
+    printf   <- externVarArgs "printf" [ptr i8] i32
     operands <- toOperands expr
-    mapM printf operands
+    mapM (callPrintf form printf) operands
     ret (int32 0)
   )
   emptyCodegen
  where
-  printf r = do
-    form   <- globalStringPtr "%d\n" "putNumForm"
-    printf <- externVarArgs "printf" [ptr i8] i32
+  callPrintf form printf r = do
     call printf [(ConstantOperand form, []), (r, [])]
 
 

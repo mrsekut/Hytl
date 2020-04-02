@@ -33,8 +33,10 @@ import Lexer.Lexer (Token(..))
 	"if"			{ TokenIf }
 	"then"			{ TokenThen }
 	"else"			{ TokenElse }
+	semi			{ TokenSemicolon }
 
 
+%right semi
 %right '='
 %left "=>"
 %left "if" "then" "else"
@@ -45,12 +47,13 @@ import Lexer.Lexer (Token(..))
 %%
 
 Program :: { Program }
-	: Stmt								{ Program [$1] }
+	: Stmt semi							{ Program [$1] }
+	| Program Stmt semi					{ merge $1 $2 }
 
 Stmt :: { Stmt }
-	: var '=' Exp						{ Assign $1 $3 }
-	| "if" Exp "then" Exp "else" Exp	{ If $2 $4 $6 }
-	| Exp								{ Exp $1 }
+	: var '=' Exp 						{ Assign $1 $3 }
+	| "if" Exp "then" Exp "else" Exp 	{ If $2 $4 $6 }
+	| Exp 								{ Exp $1 }
 
 Exp :: { Exp }
 	: var "=>" Exp						{ Lambda $1 $3 }
@@ -76,5 +79,8 @@ Exp :: { Exp }
 
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
+
+merge :: Program -> Stmt -> Program
+merge (Program xs) x = Program (xs ++ [x])
 
 }
