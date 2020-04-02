@@ -2,3 +2,6 @@
 hytl.cabal
 *~
 examples/tmp/
+
+src/Lexer/Lexer.hs
+src/Parser/Parser.hs
