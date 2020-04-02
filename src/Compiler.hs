@@ -14,6 +14,8 @@ import           LLVM.AST                hiding ( function
                                                 , value
                                                 )
 import           LLVM.AST.Type                 as AST
+import qualified LLVM.AST.IntegerPredicate     as IP
+
 
 import           LLVM.IRBuilder.Module
 import           LLVM.IRBuilder.Monad
@@ -72,6 +74,28 @@ instance LLVMOperand AST.Exp where
     x1' <- toOperand x1
     x2' <- toOperand x2
     sdiv x1' x2'
+
+  toOperand (AST.Eq x1 x2) = mdo
+    x1' <- toOperand x1
+    x2' <- toOperand x2
+    icmp IP.EQ x1' x2' -- 1==true, 0==false
+  toOperand (AST.Gt x1 x2) = mdo
+    x1' <- toOperand x1
+    x2' <- toOperand x2
+    icmp IP.UGT x1' x2' -- 1==true, 0==false
+  toOperand (AST.Ge x1 x2) = mdo
+    x1' <- toOperand x1
+    x2' <- toOperand x2
+    icmp IP.UGE x1' x2' -- 1==true, 0==false
+  toOperand (AST.Lt x1 x2) = mdo
+    x1' <- toOperand x1
+    x2' <- toOperand x2
+    icmp IP.ULT x1' x2' -- 1==true, 0==false
+  toOperand (AST.Le x1 x2) = mdo
+    x1' <- toOperand x1
+    x2' <- toOperand x2
+    icmp IP.ULE x1' x2' -- 1==true, 0==false
+
 
   toOperand (AST.Var x) = mdo
     a <- get
