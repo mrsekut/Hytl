@@ -15,11 +15,8 @@ import           Control.Monad                  ( unless )
 {- AST mode -}
 
 astRepl :: IO ()
-astRepl = repl showAST
+astRepl = repl $ show . parse . lexer
  where
-  showAST :: String -> String
-  showAST = show . parse . lexer
-
   repl :: (String -> String) -> IO ()
   repl eval = do
     input <- read_

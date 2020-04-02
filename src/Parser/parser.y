@@ -2,9 +2,6 @@
 module Parser.Parser (parse) where
 
 import Parser.AST
-	(Exp(..)
-    , Stmt(..)
-	)
 import Lexer.Lexer (Token(..))
 }
 
@@ -46,6 +43,9 @@ import Lexer.Lexer (Token(..))
 %left '*' '/'
 
 %%
+
+Program :: { Program }
+	: Stmt								{ Program [$1] }
 
 Stmt :: { Stmt }
 	: var '=' Exp						{ Assign $1 $3 }

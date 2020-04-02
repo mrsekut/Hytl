@@ -95,6 +95,9 @@ instance EvalC Stmt where
     eval x
 
 
+instance EvalC Program where
+  eval (Program stmt) = eval $ head stmt
+
 
 {- Utils -}
 

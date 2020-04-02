@@ -1,11 +1,11 @@
 module Parser.AST
     ( Exp(..)
     , Stmt(..)
-    -- , Program(..)
+    , Program(..)
     )
 where
 
--- newtype Program = Program [Stmt] deriving (Show, Eq)
+newtype Program = Program [Stmt] deriving (Show, Eq)
 
 data Stmt
     = Exp Exp
