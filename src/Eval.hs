@@ -34,57 +34,65 @@ newtype Eval a = Eval (ReaderT Env IO a)
 
 {- Eval -}
 
-eval :: Exp -> Eval Integer
-eval (Nat  n   ) = return n
-eval (Bool b   ) = return $ if b then 1 else 0 -- 1==true, 0==false
+class EvalC a where
+  eval :: a -> Eval Integer
 
-eval (Add x1 x2) = (+) <$> eval x1 <*> eval x2
-eval (Sub x1 x2) = (-) <$> eval x1 <*> eval x2
-eval (Mul x1 x2) = (*) <$> eval x1 <*> eval x2
-eval (Div x1 x2) = quot <$> eval x1 <*> eval x2
+instance EvalC Exp where
+  eval (Nat  n   ) = return n
+  eval (Bool b   ) = return $ if b then 1 else 0 -- 1==true, 0==false
 
-eval (Eq  x1 x2) = do
-  n1 <- eval x1
-  n2 <- eval x2
-  return $ if n1 == n2 then 1 else 0 -- 1==true, 0==false
-eval (Gt x1 x2) = do
-  n1 <- eval x1
-  n2 <- eval x2
-  return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false
-eval (Ge x1 x2) = do
-  n1 <- eval x1
-  n2 <- eval x2
-  return $ if n1 >= n2 then 1 else 0 -- 1==true, 0==false
-eval (Lt x1 x2) = do
-  n1 <- eval x1
-  n2 <- eval x2
-  return $ if n1 < n2 then 1 else 0 -- 1==true, 0==false
-eval (Le x1 x2) = do
-  n1 <- eval x1
-  n2 <- eval x2
-  return $ if n1 <= n2 then 1 else 0 -- 1==true, 0==false
+  eval (Add x1 x2) = (+) <$> eval x1 <*> eval x2
+  eval (Sub x1 x2) = (-) <$> eval x1 <*> eval x2
+  eval (Mul x1 x2) = (*) <$> eval x1 <*> eval x2
+  eval (Div x1 x2) = quot <$> eval x1 <*> eval x2
 
-eval (If b t e) = do
-  cond <- eval b
-  if cond == 1 then eval t else eval e
+  eval (Eq  x1 x2) = do
+    n1 <- eval x1
+    n2 <- eval x2
+    return $ if n1 == n2 then 1 else 0 -- 1==true, 0==false
+  eval (Gt x1 x2) = do
+    n1 <- eval x1
+    n2 <- eval x2
+    return $ if n1 > n2 then 1 else 0 -- 1==true, 0==false
+  eval (Ge x1 x2) = do
+    n1 <- eval x1
+    n2 <- eval x2
+    return $ if n1 >= n2 then 1 else 0 -- 1==true, 0==false
+  eval (Lt x1 x2) = do
+    n1 <- eval x1
+    n2 <- eval x2
+    return $ if n1 < n2 then 1 else 0 -- 1==true, 0==false
+  eval (Le x1 x2) = do
+    n1 <- eval x1
+    n2 <- eval x2
+    return $ if n1 <= n2 then 1 else 0 -- 1==true, 0==false
 
-eval (Assign v x) = do
-  envBind v x
-  eval x
-eval (Var x) = do
-  v <- getVar x
-  eval v
-eval (Lambda arg body) = do
-  envBind arg body
-  eval (Nat (-1))
-eval (App f x) = do
-  exp <- getVar f
-  case exp of
-    Lambda arg body -> do
-      x' <- eval x
-      bindVars [(arg, Nat x')]
-      eval body
-    _ -> return (-1)
+  eval (Var x) = do
+    v <- getVar x
+    eval v
+  eval (Lambda arg body) = do
+    envBind arg body
+    eval (Nat (-1))
+  eval (App f x) = do
+    exp <- getVar f
+    case exp of
+      Lambda arg body -> do
+        x' <- eval x
+        bindVars [(arg, Nat x')]
+        eval body
+      _ -> return (-1)
+
+
+instance EvalC Stmt where
+  eval (Exp e   ) = eval e
+
+  eval (If b t e) = do
+    cond <- eval b
+    if cond == 1 then eval t else eval e
+
+  eval (Assign v x) = do
+    envBind v x
+    eval x
 
 
 

@@ -1,7 +1,17 @@
 module Parser.AST
     ( Exp(..)
+    , Stmt(..)
+    -- , Program(..)
     )
 where
+
+-- newtype Program = Program [Stmt] deriving (Show, Eq)
+
+data Stmt
+    = Exp Exp
+    | Assign String Exp
+    | If Exp Exp Exp
+    deriving (Show, Eq)
 
 data Exp
     = Nat Integer
@@ -19,8 +29,6 @@ data Exp
     | Le Exp Exp
 
     | Var String
-    | Assign String Exp
     | Lambda String Exp
     | App String Exp
-    | If Exp Exp Exp
     deriving (Eq, Show)

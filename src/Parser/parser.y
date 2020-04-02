@@ -1,7 +1,10 @@
 {
 module Parser.Parser (parse) where
 
-import Parser.AST (Exp(..))
+import Parser.AST
+	(Exp(..)
+    , Stmt(..)
+	)
 import Lexer.Lexer (Token(..))
 }
 
@@ -44,9 +47,13 @@ import Lexer.Lexer (Token(..))
 
 %%
 
-Exp
+Stmt :: { Stmt }
 	: var '=' Exp						{ Assign $1 $3 }
-	| var "=>" Exp						{ Lambda $1 $3 }
+	| "if" Exp "then" Exp "else" Exp	{ If $2 $4 $6 }
+	| Exp								{ Exp $1 }
+
+Exp :: { Exp }
+	: var "=>" Exp						{ Lambda $1 $3 }
 
 	| Exp '+' Exp						{ Add $1 $3 }
 	| Exp '-' Exp						{ Sub $1 $3 }
@@ -60,7 +67,6 @@ Exp
 	| Exp '<' Exp						{ Lt $1 $3 }
 	| Exp "<=" Exp						{ Le $1 $3 }
 
-	| "if" Exp "then" Exp "else" Exp	{ If $2 $4 $6 }
 	| int								{ Nat $1 }
 	| var								{ Var $1 }
 	| bool								{ Bool $1 }

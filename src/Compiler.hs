@@ -29,7 +29,7 @@ type GenDec = ModuleBuilderT (State GenState)
 
 
 
-compile :: AST.Exp -> Text
+compile :: AST.Stmt -> Text
 compile expr = ppllvm $ evalState
   (buildModuleT "main" $ function "main" [] i32 $ \_ -> mdo
     r <- toOperand expr
@@ -51,6 +51,7 @@ emptyCodegen = GenState $ M.fromList []
 class LLVMOperand a where
   toOperand :: a -> CodeGen Operand
 
+
 instance LLVMOperand AST.Exp where
   toOperand (AST.Nat n    ) = return (int32 n)
 
@@ -71,13 +72,18 @@ instance LLVMOperand AST.Exp where
     x2' <- toOperand x2
     sdiv x1' x2'
 
+  toOperand (AST.Var x) = mdo
+    a <- get
+    toOperand $ fromJust $ M.lookup x $ table a
+
+
+instance LLVMOperand AST.Stmt where
+  toOperand (AST.Exp e       ) = toOperand e
+
   toOperand (AST.Assign s exp) = mdo
     let li = M.fromList [(s, exp)]
     modify (\s -> s { table = li })
     toOperand exp
-  toOperand (AST.Var x) = mdo
-    a <- get
-    toOperand $ fromJust $ M.lookup x $ table a
 
 -- addTable :: (MonadState GenState m, MonadTrans t) => String -> Operand -> t m ()
 -- addTable name opr = lift (modify (\s -> s { table = set name opr }))
