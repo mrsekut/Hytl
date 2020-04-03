@@ -97,9 +97,11 @@ instance LLVMOperand AST.Exp where
     icmp IP.ULE x1' x2' -- 1==true, 0==false
 
 
-  toOperand (AST.Var x) = mdo
-    a <- get
-    toOperand $ fromJust $ M.lookup x $ table a
+  toOperand (AST.Var x) = toOperand =<< getVar x
+
+  -- toOperand (AST.Lambda arg body) = mdo
+  --   exp <- getVar
+
 
 
 instance LLVMOperand AST.Stmt where
@@ -115,5 +117,15 @@ instance LLVMOperand AST.Program where
   toOperands (AST.Program stmt) = mapM toOperand stmt
 
 
+{- Utils -}
 -- addTable :: (MonadState GenState m, MonadTrans t) => String -> Operand -> t m ()
 -- addTable name opr = lift (modify (\s -> s { table = set name opr }))
+
+
+getVar :: String -> CodeGen AST.Exp
+getVar var = do
+  st <- get
+  case M.lookup var $ table st of
+    Just v  -> return v
+    Nothing -> return (AST.Nat $ (toInteger . length) (table st))
+
