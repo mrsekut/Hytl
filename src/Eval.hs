@@ -125,5 +125,4 @@ envBind var ast = do
 bindVars :: [(String, Exp)] -> Eval ()
 bindVars bindings = do
   env <- ask
-  e   <- liftIO $ readIORef env
   liftIO $ modifyIORef env ((++) bindings)

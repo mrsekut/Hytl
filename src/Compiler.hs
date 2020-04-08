@@ -97,11 +97,16 @@ instance LLVMOperand AST.Exp where
 
 
   toOperand (AST.Var x          ) = toOperand =<< getVar x
-
   toOperand (AST.Lambda arg body) = mdo
     envBind arg body
     toOperand (AST.Nat (-1))
-
+  toOperand (AST.App f x) = do
+    exp <- getVar f
+    case exp of
+      AST.Lambda arg body -> do
+        bindVars [(arg, x)]
+        toOperand body
+      _ -> toOperand (AST.Nat (-1))
 
 
 instance LLVMOperand AST.Stmt where
@@ -118,10 +123,6 @@ instance LLVMOperand AST.Program where
 
 {- Utils -}
 
--- addTable :: (MonadState GenState m, MonadTrans t) => String -> Operand -> t m ()
--- addTable name opr = lift (modify (\s -> s { table = set name opr }))
-
-
 getVar :: String -> CodeGen AST.Exp
 getVar var = do
   st <- get
@@ -134,3 +135,9 @@ envBind :: String -> AST.Exp -> CodeGen ()
 envBind var ast = do
   GenState st <- get
   put $ GenState $ M.insert var ast st
+
+
+bindVars :: [(String, AST.Exp)] -> CodeGen ()
+bindVars bindings = do
+  GenState st <- get
+  put $ GenState $ M.union (M.fromList bindings) st
