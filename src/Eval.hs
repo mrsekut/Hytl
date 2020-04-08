@@ -67,9 +67,7 @@ instance EvalC Exp where
     n2 <- eval x2
     return $ if n1 <= n2 then 1 else 0 -- 1==true, 0==false
 
-  eval (Var x) = do
-    v <- getVar x
-    eval v
+  eval (Var x          ) = eval =<< getVar x
   eval (Lambda arg body) = do
     envBind arg body
     eval (Nat (-1))

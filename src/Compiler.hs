@@ -25,7 +25,7 @@ import           LLVM.IRBuilder.Constant
 import qualified Parser.AST                    as AST
 
 
-data GenState = GenState { table :: M.Map String AST.Exp}
+newtype GenState = GenState { table :: M.Map String AST.Exp}
 type CodeGen a = IRBuilderT GenDec a
 type GenDec = ModuleBuilderT (State GenState)
 
@@ -42,8 +42,7 @@ compile expr = ppllvm $ evalState
   )
   emptyCodegen
  where
-  callPrintf form printf r = do
-    call printf [(ConstantOperand form, []), (r, [])]
+  callPrintf form printf r = call printf [(ConstantOperand form, []), (r, [])]
 
 
 emptyCodegen :: GenState
@@ -97,10 +96,11 @@ instance LLVMOperand AST.Exp where
     icmp IP.ULE x1' x2' -- 1==true, 0==false
 
 
-  toOperand (AST.Var x) = toOperand =<< getVar x
+  toOperand (AST.Var x          ) = toOperand =<< getVar x
 
-  -- toOperand (AST.Lambda arg body) = mdo
-  --   exp <- getVar
+  toOperand (AST.Lambda arg body) = mdo
+    envBind arg body
+    toOperand (AST.Nat (-1))
 
 
 
@@ -108,8 +108,7 @@ instance LLVMOperand AST.Stmt where
   toOperand (AST.Exp e       ) = toOperand e
 
   toOperand (AST.Assign s exp) = mdo
-    let li = M.fromList [(s, exp)]
-    modify (\s -> s { table = li })
+    envBind s exp
     toOperand exp
 
 
@@ -118,6 +117,7 @@ instance LLVMOperand AST.Program where
 
 
 {- Utils -}
+
 -- addTable :: (MonadState GenState m, MonadTrans t) => String -> Operand -> t m ()
 -- addTable name opr = lift (modify (\s -> s { table = set name opr }))
 
@@ -129,3 +129,8 @@ getVar var = do
     Just v  -> return v
     Nothing -> return (AST.Nat $ (toInteger . length) (table st))
 
+
+envBind :: String -> AST.Exp -> CodeGen ()
+envBind var ast = do
+  GenState st <- get
+  put $ GenState $ M.insert var ast st
