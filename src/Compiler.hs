@@ -13,7 +13,7 @@ import           LLVM.Pretty
 import           LLVM.AST                hiding ( function
                                                 , value
                                                 )
-import           LLVM.AST.Type                 as AST
+import           LLVM.AST.Type
 import qualified LLVM.AST.IntegerPredicate     as IP
 
 
@@ -33,16 +33,29 @@ type GenDec = ModuleBuilderT (State GenState)
 
 compile :: AST.Program -> Text
 compile expr = ppllvm $ evalState
-  (buildModuleT "main" $ function "main" [] i32 $ \_ -> mdo
-    form     <- globalStringPtr "%d\n" "putNumForm"
-    printf   <- externVarArgs "printf" [ptr i8] i32
-    operands <- toOperands expr
-    mapM (callPrintf form printf) operands
-    ret (int32 0)
+  (buildModuleT "program" $ do
+    -- genFunction expr
+    genMain expr
   )
   emptyCodegen
- where
-  callPrintf form printf r = call printf [(ConstantOperand form, []), (r, [])]
+
+
+genMain :: LLVMOperand a => a -> GenDec Operand
+genMain expr = function "main" [] i32 $ \_ -> block `named` "entry" >> mdo
+  form   <- globalStringPtr "%d\n" "putNumForm"
+  printf <- externVarArgs "printf" [ptr i8] i32
+  let callPrintf r = call printf [(ConstantOperand form, []), (r, [])]
+
+  operands <- toOperands expr
+  mapM callPrintf operands
+
+  ret $ int32 0
+
+
+-- genFunction :: LLVMOperand a => a -> GenDec Operand
+-- genFunction expr = function "func" [] i32 $ \_ -> mdo
+--   operands <- toOperands expr
+--   ret $ last operands
 
 
 emptyCodegen :: GenState
@@ -56,7 +69,7 @@ class LLVMOperand a where
 
 instance LLVMOperand AST.Exp where
   toOperand (AST.Nat  n   ) = return (int32 n)
-  toOperand (AST.Bool b   ) = return $ if b then int32 1 else int32 0 -- 1==true, 0==false
+  toOperand (AST.Bool b   ) = return $ if b then bit 1 else bit 0 -- 1==true, 0==false
 
   toOperand (AST.Add x1 x2) = mdo
     x1' <- toOperand x1
@@ -97,8 +110,19 @@ instance LLVMOperand AST.Exp where
     icmp IP.ULE x1' x2' -- 1==true, 0==false
 
   toOperand (AST.If b t e) = mdo
-    cond <- toOperand b
-    if cond == int32 1 then toOperand t else toOperand e
+    cond  <- toOperand b
+    then' <- freshName "then"
+    else' <- freshName "else"
+
+    condBr cond then' else'
+
+    emitBlockStart then'
+    toOperand t
+
+    emitBlockStart else'
+    toOperand e
+
+-- if cond == bit 1 then toOperand t else toOperand e
 
   toOperand (AST.Var x          ) = toOperand =<< getVar x
   toOperand (AST.Lambda arg body) = mdo
