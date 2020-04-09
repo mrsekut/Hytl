@@ -52,10 +52,10 @@ genMain expr = function "main" [] i32 $ \_ -> block `named` "entry" >> mdo
   ret $ int32 0
 
 
--- genFunction :: LLVMOperand a => a -> GenDec Operand
--- genFunction expr = function "func" [] i32 $ \_ -> mdo
---   operands <- toOperands expr
---   ret $ last operands
+genFunction :: LLVMOperand a => a -> GenDec Operand
+genFunction expr = function "func" [] i32 $ \_ -> mdo
+  operands <- toOperands expr
+  ret $ last operands
 
 
 emptyCodegen :: GenState
@@ -125,9 +125,11 @@ instance LLVMOperand AST.Exp where
 -- if cond == bit 1 then toOperand t else toOperand e
 
   toOperand (AST.Var x          ) = toOperand =<< getVar x
+
   toOperand (AST.Lambda arg body) = mdo
     envBind arg body
     toOperand (AST.Nat (-1))
+
   toOperand (AST.App f x) = mdo
     exp <- getVar f
     case exp of
@@ -138,11 +140,12 @@ instance LLVMOperand AST.Exp where
 
 
 instance LLVMOperand AST.Stmt where
-  toOperand (AST.Exp e       ) = toOperand e
+  toOperand (AST.Exp e          ) = toOperand e
 
-  toOperand (AST.Assign s exp) = mdo
-    envBind s exp
+  toOperand (AST.Assign name exp) = mdo
     toOperand exp
+    envBind name exp
+    toOperand (AST.Nat (-1))
 
 instance LLVMOperand AST.Program where
   toOperands (AST.Program stmt) = mapM toOperand stmt
@@ -151,11 +154,11 @@ instance LLVMOperand AST.Program where
 {- Utils -}
 
 getVar :: String -> CodeGen AST.Exp
-getVar var = do
+getVar name = do
   st <- get
-  case M.lookup var $ table st of
+  case M.lookup name $ table st of
     Just v  -> return v
-    Nothing -> return (AST.Nat $ (toInteger . length) (table st))
+    Nothing -> fail $ "Var " ++ name ++ " not defeined"
 
 
 envBind :: String -> AST.Exp -> CodeGen ()
