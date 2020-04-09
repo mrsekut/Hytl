@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
     echo "!!! Please specify an argument !!!"
 fi
 
-printf $1 >./examples/tmp/tmp.hytl
+printf "$1" >./examples/tmp/tmp.hytl
 echo ""
 echo "maked ./examples/tmp/tmp.hytl"
 

@@ -10,7 +10,6 @@ newtype Program = Program [Stmt] deriving (Show, Eq)
 data Stmt
     = Exp Exp
     | Assign String Exp
-    | If Exp Exp Exp
     deriving (Show, Eq)
 
 data Exp
@@ -27,6 +26,8 @@ data Exp
     | Ge Exp Exp
     | Lt Exp Exp
     | Le Exp Exp
+
+    | If Exp Exp Exp
 
     | Var String
     | Lambda String Exp

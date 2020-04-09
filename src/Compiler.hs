@@ -55,7 +55,8 @@ class LLVMOperand a where
 
 
 instance LLVMOperand AST.Exp where
-  toOperand (AST.Nat n    ) = return (int32 n)
+  toOperand (AST.Nat  n   ) = return (int32 n)
+  toOperand (AST.Bool b   ) = return $ if b then int32 1 else int32 0 -- 1==true, 0==false
 
   toOperand (AST.Add x1 x2) = mdo
     x1' <- toOperand x1
@@ -95,15 +96,18 @@ instance LLVMOperand AST.Exp where
     x2' <- toOperand x2
     icmp IP.ULE x1' x2' -- 1==true, 0==false
 
+  toOperand (AST.If b t e) = mdo
+    cond <- toOperand b
+    if cond == int32 1 then toOperand t else toOperand e
 
   toOperand (AST.Var x          ) = toOperand =<< getVar x
   toOperand (AST.Lambda arg body) = mdo
     envBind arg body
     toOperand (AST.Nat (-1))
-  toOperand (AST.App f x) = do
+  toOperand (AST.App f x) = mdo
     exp <- getVar f
     case exp of
-      AST.Lambda arg body -> do
+      AST.Lambda arg body -> mdo
         bindVars [(arg, x)]
         toOperand body
       _ -> toOperand (AST.Nat (-1))
@@ -115,7 +119,6 @@ instance LLVMOperand AST.Stmt where
   toOperand (AST.Assign s exp) = mdo
     envBind s exp
     toOperand exp
-
 
 instance LLVMOperand AST.Program where
   toOperands (AST.Program stmt) = mapM toOperand stmt

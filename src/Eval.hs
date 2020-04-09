@@ -67,6 +67,10 @@ instance EvalC Exp where
     n2 <- eval x2
     return $ if n1 <= n2 then 1 else 0 -- 1==true, 0==false
 
+  eval (If b t e) = do
+    cond <- eval b
+    if cond == 1 then eval t else eval e
+
   eval (Var x          ) = eval =<< getVar x
   eval (Lambda arg body) = do
     envBind arg body
@@ -83,10 +87,6 @@ instance EvalC Exp where
 
 instance EvalC Stmt where
   eval (Exp e   ) = eval e
-
-  eval (If b t e) = do
-    cond <- eval b
-    if cond == 1 then eval t else eval e
 
   eval (Assign v x) = do
     envBind v x
