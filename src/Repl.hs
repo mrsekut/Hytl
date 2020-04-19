@@ -31,15 +31,22 @@ evalRepl :: IO ()
 evalRepl = replIO showEval =<< emptyEnv
  where
   showEval :: String -> Env -> IO Integer
-  showEval s = runEval $ eval ((parse . lexer) s)
+  showEval s = do
+    let ast = ((parse . lexer) s)
+    runEval $ eval ast
 
   replIO :: (String -> Env -> IO Integer) -> Env -> IO ()
   replIO eval env = do
     input <- read_
-    unless (input == ":quit") $ do
+    f input env eval
+
+  f input env eval
+    | input == ":quit" || input == ":q" = pure ()
+    | otherwise = do
       value <- eval input env
       print_ $ show value
       replIO eval env
+
 
 
 {- Utils -}
