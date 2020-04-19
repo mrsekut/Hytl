@@ -1,5 +1,6 @@
 module Type.TypeInfer where
 
+import           Type.Type                      ( Constraint(..) )
 import qualified Parser.AST                    as AST
 import           Control.Monad.ST               ( ST
                                                 , runST
@@ -16,23 +17,8 @@ import           Data.STRef                     ( newSTRef
 import qualified Data.Map                      as M
 
 
-data Constraint
-  = CInt
-  | CBool
-  | CVar Int
-  | CLambda Constraint Constraint
-  deriving (Show, Eq)
-
 type Env = Map String Constraint
 type VarInfo = (Int, Map Int Constraint)
-
-
-infer :: Env -> AST.Exp -> Constraint
-infer env expr = runST $ do
-  varInfoRef   <- newSTRef (0, empty)
-  t            <- doInfer env varInfoRef expr
-  (_, varDict) <- readSTRef varInfoRef
-  return $ refer t varDict
 
 
 doInfer :: Env -> STRef s VarInfo -> AST.Exp -> ST s Constraint
@@ -58,6 +44,16 @@ doInfer env varInfoRef exp = case exp of
   AST.App f arg -> do
     argt <- doInfer env varInfoRef arg
     createVar varInfoRef
+
+
+infer :: Env -> AST.Exp -> Constraint
+infer env expr = runST $ do
+  varInfoRef   <- newSTRef (0, empty)
+  t            <- doInfer env varInfoRef expr
+  (_, varDict) <- readSTRef varInfoRef
+  return $ refer t varDict
+
+
 
 
 {- Utils -}
