@@ -1,88 +1,126 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Type.TypeInfer where
 
 import           Type.Type                      ( Constraint(..) )
 import qualified Parser.AST                    as AST
-import           Control.Monad.ST               ( ST
-                                                , runST
+import           Control.Monad.State            ( StateT
+                                                , runStateT
+                                                , put
+                                                , get
+                                                , MonadState
+                                                )
+import           Control.Monad.Identity         ( Identity
+                                                , runIdentity
                                                 )
 import           Data.Map                       ( empty
                                                 , fromList
                                                 , Map
                                                 )
-import           Data.STRef                     ( newSTRef
-                                                , readSTRef
-                                                , writeSTRef
-                                                , STRef
-                                                )
 import qualified Data.Map                      as M
+
+
+
+infer :: Env -> AST.Exp -> Constraint
+infer env expr = runIdentity $ runInfer
+  (do
+    t     <- doInfer expr
+    state <- get
+    let (_, varDict) = typeList_ state
+    return $ refer t varDict
+  )
+  (TypeState env (0, empty))
+
+
+runInfer :: TI Constraint -> TypeState -> Identity Constraint
+runInfer ti state = do
+  let (TI a) = ti
+  let b      = runStateT a state
+  (c, _) <- b
+  return c
+
+
 
 
 type Env = Map String Constraint
 type VarInfo = (Int, Map Int Constraint)
+data TypeState = TypeState {
+  env_ :: Env,
+  typeList_ :: VarInfo
+}
+newtype TI a = TI (StateT TypeState Identity a)
+    deriving ( Functor
+             , Applicative
+             , Monad
+             , MonadState TypeState
+             )
 
 
-doInfer :: Env -> STRef s VarInfo -> AST.Exp -> ST s Constraint
-doInfer env varInfoRef exp = case exp of
-  AST.Nat  i    -> pure CInt
-  AST.Bool x    -> pure CBool
 
-  AST.Add x1 x2 -> do
-    t1 <- doInfer env varInfoRef x1
-    unify t1 CInt varInfoRef
-    t2 <- doInfer env varInfoRef x2
-    unify t2 CInt varInfoRef
-    pure CInt
+class TypeInfer a where
+  doInfer :: AST.Exp -> TI a
 
 
-  AST.Var x -> case M.lookup x env of
-    Just t  -> pure t
-    Nothing -> fail ("not found: " ++ x)
-  AST.Lambda parm e -> do
-    tparm <- createVar varInfoRef
-    te    <- doInfer (M.insert parm tparm env) varInfoRef e
+instance TypeInfer Constraint where
+  doInfer (AST.Nat  i   ) = return CInt
+  doInfer (AST.Bool x   ) = return CBool
+
+  doInfer (AST.Add x1 x2) = do
+    t1 <- doInfer x1
+    unify t1 CInt
+    t2 <- doInfer x2
+    unify t2 CInt
+    return CInt
+
+  doInfer (AST.Var x) = do
+    state <- get
+    let env = env_ state
+    case M.lookup x env of
+      Just t  -> return t
+      Nothing -> fail ("not found: " ++ x)
+
+  doInfer (AST.Lambda parm e) = do
+    tparm <- createVar
+    te    <- doInfer e
     return $ CLambda tparm te
-  AST.App f arg -> do
-    argt <- doInfer env varInfoRef arg
-    createVar varInfoRef
+
+  doInfer (AST.App f arg) = createVar
 
 
-infer :: Env -> AST.Exp -> Constraint
-infer env expr = runST $ do
-  varInfoRef   <- newSTRef (0, empty)
-  t            <- doInfer env varInfoRef expr
-  (_, varDict) <- readSTRef varInfoRef
-  return $ refer t varDict
 
 
 
 
 {- Utils -}
 
-unify :: Constraint -> Constraint -> STRef s VarInfo -> ST s ()
-unify (CVar i1) (CVar i2) _ | i1 == i2 = return ()
-unify (CVar i1) t2        varInfoRef   = unifyVar i1 t2 varInfoRef
-unify t1        (CVar i2) varInfoRef   = unifyVar i2 t1 varInfoRef
-unify t1 t2 _ | t1 == t2  = return ()
-              | otherwise = fail "cannot unify"
+unify :: Constraint -> Constraint -> TI ()
+unify (CVar i1) (CVar i2) | i1 == i2 = return ()
+unify (CVar i1) t2                   = unifyVar i1 t2
+unify t1        (CVar i2)            = unifyVar i2 t1
+unify t1 t2 | t1 == t2  = return ()
+            | otherwise = fail "cannot unify"
 
 
-unifyVar :: Int -> Constraint -> STRef s VarInfo -> ST s ()
-unifyVar index type2 varInfoRef = do
-  isOccur <- occur type2 index varInfoRef
+unifyVar :: Int -> Constraint -> TI ()
+unifyVar index typ = do
+  state <- get
+  let varInfoRef = typeList_ state
+  isOccur <- occur typ index varInfoRef
   if isOccur
     then error "occurs error"
     else do
-      (nextIdx, varMap) <- readSTRef varInfoRef
+      let (nextIdx, varMap) = varInfoRef
       case M.lookup index varMap of
-        Just vt -> unify vt type2 varInfoRef
-        Nothing -> writeSTRef varInfoRef (nextIdx, M.insert index type2 varMap)
+        Just vt -> unify vt typ
+        Nothing ->
+          put $ state { typeList_ = (nextIdx, M.insert index typ varMap) }
 
 
-occur :: Constraint -> Int -> STRef s VarInfo -> ST s Bool
+occur :: Constraint -> Int -> VarInfo -> TI Bool
 occur (CVar i) n varInfoRef
   | i == n = return True
   | otherwise = do
-    (_, varMap) <- readSTRef varInfoRef
+    let (_, varMap) = varInfoRef
     case M.lookup i varMap of
       Just vt -> occur vt n varInfoRef
       Nothing -> return False
@@ -97,10 +135,10 @@ refer t@(CVar v     ) varMap = case M.lookup v varMap of
 refer t _ = t
 
 
-
-createVar :: STRef s VarInfo -> ST s Constraint
-createVar varInfoRef = do
-  (nextIdx, varMap) <- readSTRef varInfoRef
-  writeSTRef varInfoRef (nextIdx + 1, varMap)
+createVar :: TI Constraint
+createVar = do
+  state <- get
+  let (nextIdx, varMap) = typeList_ state
+  put $ state { typeList_ = (nextIdx + 1, varMap) }
   return $ CVar nextIdx
 
