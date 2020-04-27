@@ -7,6 +7,10 @@ where
 
 import           Lexer.Lexer
 import           Parser.Parser
+import           Type.TypeInfer                 ( emptyTIEnv
+                                                , infer
+                                                , TIEnv
+                                                )
 import           Eval
 import           System.IO
 import           Control.Monad                  ( unless )
@@ -28,24 +32,26 @@ astRepl = repl $ show . parse . lexer
 {- Eval mode -}
 
 evalRepl :: IO ()
-evalRepl = replIO showEval =<< emptyEnv
+evalRepl = do
+  inprEnv <- emptyEnv
+  replIO inprEnv emptyTIEnv
  where
-  showEval :: String -> Env -> IO Integer
-  showEval s = do
-    let ast = ((parse . lexer) s)
-    runEval $ eval ast
-
-  replIO :: (String -> Env -> IO Integer) -> Env -> IO ()
-  replIO eval env = do
+  replIO :: Env -> TIEnv -> IO ()
+  replIO env tiEnv = do
     input <- read_
-    f input env eval
+    let ast = (parse . lexer) input
+    value <- runEval (eval ast) env
+    let typ = infer tiEnv ast
+    f input value env tiEnv typ
 
-  f input env eval
+  f input value env tiEnv typ
     | input == ":quit" || input == ":q" = pure ()
+    | input == ":type" || input == ":t" = do
+      print_ $ show typ
+      replIO env tiEnv
     | otherwise = do
-      value <- eval input env
       print_ $ show value
-      replIO eval env
+      replIO env tiEnv
 
 
 

@@ -1,6 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Type.TypeInfer where
+module Type.TypeInfer
+  ( emptyTIEnv
+  , infer
+  , TIEnv
+  )
+where
 
 import           Type.Type                      ( Constraint(..) )
 import qualified Parser.AST                    as AST
@@ -21,31 +26,31 @@ import qualified Data.Map                      as M
 
 
 
-infer :: Env -> AST.Exp -> Constraint
+infer :: TIEnv -> AST.Program -> [Constraint]
 infer env expr = runIdentity $ runInfer
   (do
-    t     <- doInfer expr
+    t     <- doInfers expr
     state <- get
     let (_, varDict) = typeList_ state
-    return $ refer t varDict
+    return $ map (flip refer varDict) t
   )
   (TypeState env (0, empty))
 
 
-runInfer :: TI Constraint -> TypeState -> Identity Constraint
-runInfer ti state = do
-  let (TI a) = ti
-  let b      = runStateT a state
-  (c, _) <- b
-  return c
+runInfer :: TI [Constraint] -> TypeState -> Identity [Constraint]
+runInfer (TI a) state = do
+  c <- runStateT a state
+  return $ fst c
 
 
+emptyTIEnv :: TIEnv
+emptyTIEnv = M.fromList []
 
 
-type Env = Map String Constraint
+type TIEnv = Map String Constraint
 type VarInfo = (Int, Map Int Constraint)
 data TypeState = TypeState {
-  env_ :: Env,
+  env_ :: TIEnv,
   typeList_ :: VarInfo
 }
 newtype TI a = TI (StateT TypeState Identity a)
@@ -58,10 +63,11 @@ newtype TI a = TI (StateT TypeState Identity a)
 
 
 class TypeInfer a where
-  doInfer :: AST.Exp -> TI a
+  doInfer :: a -> TI Constraint
+  doInfers :: a -> TI [ Constraint ]
 
 
-instance TypeInfer Constraint where
+instance TypeInfer AST.Exp where
   doInfer (AST.Nat  i   ) = return CInt
   doInfer (AST.Bool x   ) = return CBool
 
@@ -87,7 +93,14 @@ instance TypeInfer Constraint where
   doInfer (AST.App f arg) = createVar
 
 
+instance TypeInfer AST.Stmt where
+  doInfer (AST.Exp e          ) = doInfer e
 
+  doInfer (AST.Assign name exp) = return CInt -- FIXME:
+
+
+instance TypeInfer AST.Program where
+  doInfers (AST.Program stmt) = mapM doInfer stmt
 
 
 
