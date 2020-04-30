@@ -9,7 +9,7 @@ import           Lexer.Lexer
 import           Parser.Parser
 import           Type.TypeInfer                 ( emptyTIEnv
                                                 , infer
-                                                , TIEnv
+                                                , CEnv
                                                 )
 import           Eval
 import           System.IO
@@ -36,13 +36,15 @@ evalRepl = do
   inprEnv <- emptyEnv
   replIO inprEnv emptyTIEnv
  where
-  replIO :: Env -> TIEnv -> IO ()
+  replIO :: Env -> CEnv -> IO ()
   replIO env tiEnv = do
     input <- read_
     let ast = (parse . lexer) input
     value <- runEval (eval ast) env
+    print $ tiEnv
+
     let typ = infer tiEnv ast
-    f input value env tiEnv typ
+    f input typ env tiEnv typ -- NOTE: 一時的に型を表示する
 
   f input value env tiEnv typ
     | input == ":quit" || input == ":q" = pure ()
