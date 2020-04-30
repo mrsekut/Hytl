@@ -94,8 +94,6 @@ instance TypeInfer AST.Exp where
     te    <- doInfer e
     return $ CLambda tparm te
 
-  doInfer (AST.App f arg) = createVar
-
 
 instance TypeInfer AST.Stmt where
   doInfer (AST.Exp e          ) = doInfer e
