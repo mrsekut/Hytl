@@ -4,7 +4,6 @@ module Eval
   ( eval
   , emptyEnv
   , Env
-  , Eval
   , runEval
   )
 where
@@ -86,7 +85,7 @@ instance EvalC Exp where
 
 
 instance EvalC Stmt where
-  eval (Exp e   ) = eval e
+  eval (Exp e     ) = eval e
 
   eval (Assign v x) = do
     envBind v x

@@ -4,6 +4,7 @@ module Type.TypeInfer
   ( emptyTIEnv
   , infer
   , CEnv
+  , doInfers
   )
 where
 
@@ -94,6 +95,11 @@ instance TypeInfer AST.Exp where
     te    <- doInfer e
     return $ CLambda tparm te
 
+  -- スクボにメモってる
+  -- doInfer (AST.App f x) = do
+  --   tf <- doInfer f
+  --   tx <- doInfer x
+  --   undefined
 
 instance TypeInfer AST.Stmt where
   doInfer (AST.Exp e          ) = doInfer e
@@ -117,6 +123,9 @@ unify :: Constraint -> Constraint -> TI ()
 unify (CVar i1) (CVar i2) | i1 == i2 = return ()
 unify (CVar i1) t2                   = unifyVar i1 t2
 unify t1        (CVar i2)            = unifyVar i2 t1
+-- unify (CLambda f1 x1) (CLambda r1 r2) = do
+--   unify f1 r1
+--   unify r1 r2
 unify t1 t2 | t1 == t2  = return ()
             | otherwise = fail "cannot unify"
 
@@ -145,6 +154,7 @@ occur n (CVar i)
     case M.lookup i varMap of
       Just vt -> occur n vt
       Nothing -> return False
+-- occur n (CLambda f x) =
 occur _ _ = return False
 
 

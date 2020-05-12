@@ -1,7 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecursiveDo #-}
 
-module Compiler where
+module Compiler
+  ( CodeGen
+  , compile
+  )
+where
 
 import           Data.Text.Internal.Lazy
 import           Data.Functor.Identity
