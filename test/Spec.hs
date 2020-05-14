@@ -27,6 +27,20 @@ data Test = Test
      }
 
 
+-- m :: String -> [Token] -> Program -> C.Constriant -> Integer -> Test
+-- m a b c d e =
+--     Test { input = a, lexered = b, parsed = c, contraint = d, evaled = e }
+
+-- t1 :: IO Test
+-- t1 =
+--     i "add"
+--         $   "1*3;"
+--         |>> [TokenInt 1, TokenTimes, TokenInt 3, TokenSemicolon]
+--         |>> Program [Exp (Mul (Nat 1) (Nat 3))]
+--         |>> C.CInt
+--         |>> 3
+
+
 
 spec :: String -> Test -> SpecWith (Arg Expectation)
 spec testName t = it testName $ do
@@ -39,7 +53,28 @@ spec testName t = it testName $ do
 
 t1 :: IO Test
 t1 = return Test
-    { input     = "1*3;"
+    { input     = "10 + 45;"
+    , lexered   = [TokenInt 10, TokenPlus, TokenInt 45, TokenSemicolon]
+    , parsed    = Program [Exp (Add (Nat 10) (Nat 45))]
+    , contraint = C.CInt
+    -- , compiled  = 3
+    , evaled    = 55
+    }
+
+t2 :: IO Test
+t2 = return Test
+    { input     = "42 - 10;"
+    , lexered   = [TokenInt 42, TokenMinus, TokenInt 10, TokenSemicolon]
+    , parsed    = Program [Exp (Sub (Nat 42) (Nat 10))]
+    , contraint = C.CInt
+    -- , compiled  = 3
+    , evaled    = 32
+    }
+
+
+t3 :: IO Test
+t3 = return Test
+    { input     = "1 * 3;"
     , lexered   = [TokenInt 1, TokenTimes, TokenInt 3, TokenSemicolon]
     , parsed    = Program [Exp (Mul (Nat 1) (Nat 3))]
     , contraint = C.CInt
@@ -48,11 +83,37 @@ t1 = return Test
     }
 
 
+t4 :: IO Test
+t4 = return Test
+    { input     = "10 + 1 * 3;"
+    , lexered   = [ TokenInt 10
+                  , TokenPlus
+                  , TokenInt 1
+                  , TokenTimes
+                  , TokenInt 3
+                  , TokenSemicolon
+                  ]
+    , parsed    = Program [Exp (Add (Nat 10) (Mul (Nat 1) (Nat 3)))]
+    , contraint = C.CInt
+    -- , compiled  = 3
+    , evaled    = 13
+    }
+
+
+
+
 
 main :: IO ()
 main = do
-    t <- t1
-    hspec $ describe "Parser" $ spec "test!" t
+    t1' <- t1
+    t2' <- t2
+    t3' <- t3
+    t4' <- t4
+    hspec $ describe "Parser" $ do
+        spec "test!" t1'
+        spec "test!" t2'
+        spec "test!" t3'
+        spec "test!" t4'
 
 
 
