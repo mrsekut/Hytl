@@ -41,10 +41,9 @@ evalRepl = do
     input <- read_
     let ast = (parse . lexer) input
     value <- runEval (eval ast) env
-    print $ tiEnv
 
     let typ = infer tiEnv ast
-    f input typ env tiEnv typ -- NOTE: 一時的に型を表示する
+    f input value env tiEnv typ
 
   f input value env tiEnv typ
     | input == ":quit" || input == ":q" = pure ()
