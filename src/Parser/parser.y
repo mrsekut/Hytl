@@ -15,7 +15,6 @@ import Lexer.Lexer (Token(..))
 	bool			{ TokenBool $$ }
 
 	'='				{ TokenAssign  }
-	"=>"			{ TokenLambda }
 
 	'+'				{ TokenPlus }
 	'-'				{ TokenMinus }
@@ -52,12 +51,11 @@ Program :: { Program }
 
 Stmt :: { Stmt }
 	: var '=' Exp 						{ Assign $1 $3 }
+	| var var '=' Exp					{ Assign $1 (Lambda $2 $4) }
 	| Exp 								{ Exp $1 }
 
 Exp :: { Exp }
-	: var "=>" Exp						{ Lambda $1 $3 }
-
-	| Exp '+' Exp						{ Add $1 $3 }
+	: Exp '+' Exp						{ Add $1 $3 }
 	| Exp '-' Exp						{ Sub $1 $3 }
 	| Exp '*' Exp						{ Mul $1 $3 }
 	| Exp '/' Exp						{ Div $1 $3 }

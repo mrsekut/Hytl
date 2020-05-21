@@ -94,6 +94,21 @@ main = hspec $ describe "Parser" $ do
         CInt
         4
 
+    spec "function define" $ makeTest
+        "f x = x + 1;"
+        [ TokenVar "f"
+        , TokenVar "x"
+        , TokenAssign
+        , TokenVar "x"
+        , TokenPlus
+        , TokenInt 1
+        , TokenSemicolon
+        ]
+        (Program [Assign "f" (Lambda "x" (Add (Var "x") (Nat 1)))])
+        CInt
+        -1
+
+
     spec "if" $ makeTest
         "if 2>1 then 1 else 2;"
         [ TokenIf
@@ -109,6 +124,22 @@ main = hspec $ describe "Parser" $ do
         (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
         CInt
         1
+
+    -- spec "list" $ makeTest
+    --     "[1,2,3];"
+    --     [TokenIf]
+    --     (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
+    --     CInt
+    --     1
+
+    -- spec "list" $ makeTest
+    --     "[1*2, 3+4, 5];"
+    --     [TokenIf]
+    --     (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
+    --     CInt
+    --     1
+
+
 
 
 makeTest :: String -> [Token] -> Program -> Constraint -> Integer -> Test

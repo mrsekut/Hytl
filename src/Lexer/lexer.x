@@ -20,7 +20,6 @@ tokens :-
   $semi                             { \s -> TokenSemicolon }
 
   \=                                { \s -> TokenAssign }
-  \=>                               { \s -> TokenLambda }
 
   \+                                { \s -> TokenPlus }
   \-                                { \s -> TokenMinus }
@@ -46,7 +45,6 @@ tokens :-
 data Token
   = TokenInt Integer
   | TokenAssign
-  | TokenLambda
 
   | TokenPlus
   | TokenMinus
