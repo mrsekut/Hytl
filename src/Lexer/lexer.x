@@ -34,6 +34,10 @@ tokens :-
   \<                                { \s -> TokenLT }
   \<=                               { \s -> TokenLE }
 
+  \[                                { \s -> TokenLList }
+  \]                                { \s -> TokenRList }
+  \,                                { \s -> TokenColon }
+
   if                                { \s -> TokenIf }
   then                              { \s -> TokenThen }
   else                              { \s -> TokenElse }
@@ -58,6 +62,10 @@ data Token
   | TokenGE
   | TokenLT
   | TokenLE
+
+  | TokenLList
+  | TokenRList
+  | TokenColon
 
   | TokenIf
   | TokenThen

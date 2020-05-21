@@ -27,6 +27,8 @@ data Exp
     | Lt Exp Exp
     | Le Exp Exp
 
+    | List [Exp]
+
     | If Exp Exp Exp
 
     | Var String

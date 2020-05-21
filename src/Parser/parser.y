@@ -29,6 +29,10 @@ import Lexer.Lexer (Token(..))
 	'<'				{ TokenLT }
 	"<="			{ TokenLE }
 
+  	'[' 			{ TokenLList }
+  	']' 			{ TokenRList }
+  	',' 			{ TokenColon }
+
 	"if"			{ TokenIf }
 	"then"			{ TokenThen }
 	"else"			{ TokenElse }
@@ -39,6 +43,7 @@ import Lexer.Lexer (Token(..))
 %right '='
 %left "=>"
 %left "if" "then" "else"
+%left '[' ']' ','
 %left '>' "==" '<' "<=" ">="
 %left '+' '-'
 %left '*' '/'
@@ -67,11 +72,18 @@ Exp :: { Exp }
 	| Exp '<' Exp						{ Lt $1 $3 }
 	| Exp "<=" Exp						{ Le $1 $3 }
 
+	| '[' list ']'						{ List $2 }
+
 	| "if" Exp "then" Exp "else" Exp 	{ If $2 $4 $6 }
 
 	| int								{ Nat $1 }
 	| var								{ Var $1 }
 	| bool								{ Bool $1 }
+
+
+list : {- empty -}           	 		{ [] }
+      | Exp ',' list           			{ $1 : $3 }
+      | Exp            					{ $1 : [] }
 
 
 {
