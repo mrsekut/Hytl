@@ -10,6 +10,7 @@ module Eval
 where
 
 import           Data.Char                      ( toLower )
+import           Data.List                      ( intersperse )
 import           Parser.AST                     ( Exp(..)
                                                 , Stmt(..)
                                                 , Program(..)
@@ -45,33 +46,34 @@ class EvalC a where
   eval :: a -> Eval EvaledExp
 
 instance EvalC Exp where
-  eval (Nat  n       ) = return (ENat n)
-  eval (Bool b       ) = return (EBool b)
+  eval (Nat  n        ) = return (ENat n)
+  eval (Bool b        ) = return (EBool b)
 
   eval (BinOp op x1 x2) = do
     e1 <- eval x1
     e2 <- eval x2
     return $ evalOp op e1 e2
 
-  -- eval (List [exp]) = do
-  --   undefined
+  eval (List exp) = do
+    list <- mapM eval exp
+    return $ EList list
 
-  -- eval (If b t e) = do
-  --   cond <- eval b
-  --   if cond == 1 then eval t else eval e
+  eval (If b t e) = do
+    cond <- eval b
+    case cond of
+      EBool bool -> if bool then eval t else eval e
 
-  -- eval (Var x          ) = eval =<< getVar x
-  -- eval (Lambda arg body) = do
-  --   envBind arg body
-  --   return (EString "func")
-  -- eval (App f x) = do
-  --   exp <- getVar f
-  --   case exp of
-  --     Lambda arg body -> do
-  --       x' <- eval x
-  --       bindVars [(arg, Nat x')]
-  --       eval body
-  --     _ -> return $ EString "app"
+  eval (Var x          ) = eval =<< getVar x
+  eval (Lambda arg body) = do
+    envBind arg body
+    return (EString "func")
+  eval (App f x) = do
+    exp <- getVar f
+    case exp of
+      Lambda arg body -> do
+        bindVars [(arg, x)]
+        eval body
+      _ -> return $ EString "app"
 
 
 instance EvalC Stmt where
@@ -103,7 +105,8 @@ evalOp Le  (ENat e1) (ENat e2) = if e1 <= e2 then EBool True else EBool False
 showEvaledExp :: EvaledExp -> String
 showEvaledExp (ENat  i) = show i
 showEvaledExp (EBool b) = map toLower $ show b
--- showEvaledExp (EList i) = show i
+showEvaledExp (EList list) =
+  "[" ++ concat (intersperse "," $ map showEvaledExp list) ++ "]"
 
 
 runEval :: Eval EvaledExp -> Env -> IO EvaledExp

@@ -48,3 +48,4 @@ data EvaledExp
     | EBool Bool
     | EString String
     | EList [EvaledExp]
+    deriving (Eq, Show)
