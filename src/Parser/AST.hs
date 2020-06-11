@@ -2,6 +2,7 @@ module Parser.AST
     ( Exp(..)
     , Stmt(..)
     , Program(..)
+    , EvaledExp(..)
     )
 where
 
@@ -35,3 +36,10 @@ data Exp
     | Lambda String Exp
     | App String Exp
     deriving (Eq, Show)
+
+
+data EvaledExp
+    = ENat Integer
+    | EBool Bool
+    | EString String
+    | EList [EvaledExp]

@@ -94,19 +94,20 @@ main = hspec $ describe "Parser" $ do
         CInt
         4
 
-    spec "function define" $ makeTest
-        "f x = x + 1;"
-        [ TokenVar "f"
-        , TokenVar "x"
-        , TokenAssign
-        , TokenVar "x"
-        , TokenPlus
-        , TokenInt 1
-        , TokenSemicolon
-        ]
-        (Program [Assign "f" (Lambda "x" (Add (Var "x") (Nat 1)))])
-        CInt
-        -1
+    spec "function define"
+        $ makeTest
+              "f x = x + 1;"
+              [ TokenVar "f"
+              , TokenVar "x"
+              , TokenAssign
+              , TokenVar "x"
+              , TokenPlus
+              , TokenInt 1
+              , TokenSemicolon
+              ]
+              (Program [Assign "f" (Lambda "x" (Add (Var "x") (Nat 1)))])
+              CInt -- FIXME:
+        - 1
 
 
     spec "if" $ makeTest
@@ -125,12 +126,18 @@ main = hspec $ describe "Parser" $ do
         CInt
         1
 
-    -- spec "list" $ makeTest
-    --     "[1,2,3];"
-    --     [TokenIf]
-    --     (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
-    --     CInt
-    --     1
+    spec "list" $ makeTest
+        "[1,2,3];"
+        [TokenLList,
+        , TokenInt 1
+        , TokenColon
+        , TokenInt 2
+        , TokenColon
+        , TokenInt 3
+        ,TokenRList]
+        (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
+        CInt
+        1
 
     -- spec "list" $ makeTest
     --     "[1*2, 3+4, 5];"

@@ -11,7 +11,12 @@ import           Type.TypeInfer                 ( emptyTIEnv
                                                 , infer
                                                 , CEnv
                                                 )
-import           Eval
+import           Eval                           ( eval
+                                                , emptyEnv
+                                                , Env
+                                                , runEval
+                                                , showEvaledExp
+                                                )
 import           System.IO
 import           Control.Monad                  ( unless )
 
@@ -51,7 +56,7 @@ evalRepl = do
       print_ $ show typ
       replIO env tiEnv
     | otherwise = do
-      print_ $ show value
+      print_ $ showEvaledExp value
       replIO env tiEnv
 
 
