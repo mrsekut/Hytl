@@ -13,6 +13,7 @@ import           Data.Char                      ( toLower )
 import           Parser.AST                     ( Exp(..)
                                                 , Stmt(..)
                                                 , Program(..)
+                                                , Op(..)
                                                 , EvaledExp(..)
                                                 )
 import           Data.IORef
@@ -39,38 +40,18 @@ newtype Eval a = Eval (ReaderT Env IO a)
 
 {- Eval -}
 
+
 class EvalC a where
   eval :: a -> Eval EvaledExp
 
 instance EvalC Exp where
-  eval (Nat  n) = return (ENat n)
-  eval (Bool b) = return $ if b then (EBool True) else (EBool False)
+  eval (Nat  n       ) = return (ENat n)
+  eval (Bool b       ) = return (EBool b)
 
--- eval (Add x1 x2) = (+) <$> eval x1 <*> eval x2
--- eval (Sub x1 x2) = (-) <$> eval x1 <*> eval x2
--- eval (Mul x1 x2) = (*) <$> eval x1 <*> eval x2
--- eval (Div x1 x2) = quot <$> eval x1 <*> eval x2
-
-  -- eval (Eq x1 x2) = do
-  --   n1 <- eval x1
-  --   n2 <- eval x2
-  --   return $ if n1 == n2 then (EBool True) else (EBool False)
-  -- eval (Gt x1 x2) = do
-  --   n1 <- eval x1
-  --   n2 <- eval x2
-  --   return $ if n1 > n2 then (EBool True) else (EBool False)
-  -- eval (Ge x1 x2) = do
-  --   n1 <- eval x1
-  --   n2 <- eval x2
-  --   return $ if n1 >= n2 then (EBool True) else (EBool False)
-  -- eval (Lt x1 x2) = do
-  --   n1 <- eval x1
-  --   n2 <- eval x2
-  --   return $ if n1 < n2 then (EBool True) else (EBool False)
-  -- eval (Le x1 x2) = do
-  --   n1 <- eval x1
-  --   n2 <- eval x2
-  --   return $ if n1 <= n2 then (EBool True) else (EBool False)
+  eval (BinOp op x1 x2) = do
+    e1 <- eval x1
+    e2 <- eval x2
+    return $ evalOp op e1 e2
 
   -- eval (List [exp]) = do
   --   undefined
@@ -107,6 +88,18 @@ instance EvalC Program where
 
 {- Utils -}
 
+evalOp :: Op -> EvaledExp -> EvaledExp -> EvaledExp
+evalOp Add (ENat e1) (ENat e2) = ENat (e1 + e2)
+evalOp Sub (ENat e1) (ENat e2) = ENat (e1 - e2)
+evalOp Mul (ENat e1) (ENat e2) = ENat (e1 * e2)
+evalOp Div (ENat e1) (ENat e2) = ENat (e1 `quot` e2)
+evalOp Eq  (ENat e1) (ENat e2) = if e1 == e2 then EBool True else EBool False
+evalOp Gt  (ENat e1) (ENat e2) = if e1 > e2 then EBool True else EBool False
+evalOp Ge  (ENat e1) (ENat e2) = if e1 >= e2 then EBool True else EBool False
+evalOp Lt  (ENat e1) (ENat e2) = if e1 < e2 then EBool True else EBool False
+evalOp Le  (ENat e1) (ENat e2) = if e1 <= e2 then EBool True else EBool False
+
+
 showEvaledExp :: EvaledExp -> String
 showEvaledExp (ENat  i) = show i
 showEvaledExp (EBool b) = map toLower $ show b
@@ -139,4 +132,4 @@ envBind var ast = do
 bindVars :: [(String, Exp)] -> Eval ()
 bindVars bindings = do
   env <- ask
-  liftIO $ modifyIORef env ((++) bindings)
+  liftIO $ modifyIORef env (bindings ++)

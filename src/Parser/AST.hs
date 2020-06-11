@@ -2,6 +2,7 @@ module Parser.AST
     ( Exp(..)
     , Stmt(..)
     , Program(..)
+    , Op(..)
     , EvaledExp(..)
     )
 where
@@ -17,16 +18,7 @@ data Exp
     = Nat Integer
     | Bool Bool
 
-    | Add Exp Exp
-    | Sub Exp Exp
-    | Mul Exp Exp
-    | Div Exp Exp
-
-    | Eq Exp Exp
-    | Gt Exp Exp
-    | Ge Exp Exp
-    | Lt Exp Exp
-    | Le Exp Exp
+    | BinOp Op Exp Exp
 
     | List [Exp]
 
@@ -36,6 +28,19 @@ data Exp
     | Lambda String Exp
     | App String Exp
     deriving (Eq, Show)
+
+data Op
+    = Add
+    | Sub
+    | Mul
+    | Div
+    | Eq
+    | Gt
+    | Ge
+    | Lt
+    | Le
+    deriving (Eq, Show)
+
 
 
 data EvaledExp

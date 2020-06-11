@@ -17,6 +17,17 @@ mod = x => n => x % n
 add3 = x => x + 3
 
 
+head [] = []
+head (x:xs) = x
+
+tail [] = []
+tail (x:xs) = xs
+
+concat [] [] = []
+concat xs ys = xs:ys
+
+
+
 fib = match
     0 => 0
     1 => 1

@@ -63,27 +63,27 @@ class TypeInfer a where
 
 
 instance TypeInfer AST.Exp where
-  doInfer (AST.Nat  i   ) = return CInt
-  doInfer (AST.Bool x   ) = return CBool
+  doInfer (AST.Nat  i) = return CInt
+  doInfer (AST.Bool x) = return CBool
 
-  doInfer (AST.Add x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
-  doInfer (AST.Sub x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
-  doInfer (AST.Mul x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
-  doInfer (AST.Div x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
+-- doInfer (AST.Add x1 x2) = do
+--   unify CInt =<< doInfer x1
+--   unify CInt =<< doInfer x2
+--   return CInt
+-- doInfer (AST.Sub x1 x2) = do
+--   unify CInt =<< doInfer x1
+--   unify CInt =<< doInfer x2
+--   return CInt
+-- doInfer (AST.Mul x1 x2) = do
+--   unify CInt =<< doInfer x1
+--   unify CInt =<< doInfer x2
+--   return CInt
+-- doInfer (AST.Div x1 x2) = do
+--   unify CInt =<< doInfer x1
+--   unify CInt =<< doInfer x2
+--   return CInt
 
-  doInfer (AST.Var x) = do
+  doInfer (AST.Var  x) = do
     state <- get
     let env = cenv_ state
     case M.lookup x env of

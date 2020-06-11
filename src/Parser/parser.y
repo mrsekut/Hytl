@@ -60,17 +60,17 @@ Stmt :: { Stmt }
 	| Exp 								{ Exp $1 }
 
 Exp :: { Exp }
-	: Exp '+' Exp						{ Add $1 $3 }
-	| Exp '-' Exp						{ Sub $1 $3 }
-	| Exp '*' Exp						{ Mul $1 $3 }
-	| Exp '/' Exp						{ Div $1 $3 }
+	: Exp '+' Exp						{ BinOp Add $1 $3 }
+	| Exp '-' Exp						{ BinOp Sub $1 $3 }
+	| Exp '*' Exp						{ BinOp Mul $1 $3 }
+	| Exp '/' Exp						{ BinOp Div $1 $3 }
 
 	| var '(' Exp ')'					{ App $1 $3 }
-	| Exp "==" Exp						{ Eq $1 $3 }
-	| Exp '>' Exp						{ Gt $1 $3 }
-	| Exp ">=" Exp						{ Ge $1 $3 }
-	| Exp '<' Exp						{ Lt $1 $3 }
-	| Exp "<=" Exp						{ Le $1 $3 }
+	| Exp "==" Exp						{ BinOp Eq $1 $3 }
+	| Exp '>' Exp						{ BinOp Gt $1 $3 }
+	| Exp ">=" Exp						{ BinOp Ge $1 $3 }
+	| Exp '<' Exp						{ BinOp Lt $1 $3 }
+	| Exp "<=" Exp						{ BinOp Le $1 $3 }
 
 	| '[' list ']'						{ List $2 }
 

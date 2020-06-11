@@ -72,46 +72,46 @@ class LLVMOperand a where
 
 
 instance LLVMOperand AST.Exp where
-  toOperand (AST.Nat  n   ) = return (int32 n)
-  toOperand (AST.Bool b   ) = return $ if b then bit 1 else bit 0 -- 1==true, 0==false
+  toOperand (AST.Nat  n  ) = return (int32 n)
+  toOperand (AST.Bool b  ) = return $ if b then bit 1 else bit 0 -- 1==true, 0==false
 
-  toOperand (AST.Add x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    add x1' x2'
-  toOperand (AST.Sub x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    sub x1' x2'
-  toOperand (AST.Mul x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    mul x1' x2'
-  toOperand (AST.Div x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    sdiv x1' x2'
+-- toOperand (AST.Add x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   add x1' x2'
+-- toOperand (AST.Sub x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   sub x1' x2'
+-- toOperand (AST.Mul x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   mul x1' x2'
+-- toOperand (AST.Div x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   sdiv x1' x2'
 
-  toOperand (AST.Eq x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    icmp IP.EQ x1' x2' -- 1==true, 0==false
-  toOperand (AST.Gt x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    icmp IP.UGT x1' x2' -- 1==true, 0==false
-  toOperand (AST.Ge x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    icmp IP.UGE x1' x2' -- 1==true, 0==false
-  toOperand (AST.Lt x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    icmp IP.ULT x1' x2' -- 1==true, 0==false
-  toOperand (AST.Le x1 x2) = mdo
-    x1' <- toOperand x1
-    x2' <- toOperand x2
-    icmp IP.ULE x1' x2' -- 1==true, 0==false
+-- toOperand (AST.Eq x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   icmp IP.EQ x1' x2' -- 1==true, 0==false
+-- toOperand (AST.Gt x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   icmp IP.UGT x1' x2' -- 1==true, 0==false
+-- toOperand (AST.Ge x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   icmp IP.UGE x1' x2' -- 1==true, 0==false
+-- toOperand (AST.Lt x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   icmp IP.ULT x1' x2' -- 1==true, 0==false
+-- toOperand (AST.Le x1 x2) = mdo
+--   x1' <- toOperand x1
+--   x2' <- toOperand x2
+--   icmp IP.ULE x1' x2' -- 1==true, 0==false
 
   toOperand (AST.If b t e) = mdo
     cond  <- toOperand b
