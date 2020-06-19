@@ -71,7 +71,8 @@ instance EvalC Exp where
     exp <- getVar f
     case exp of
       Lambda arg body -> do
-        bindVars [(arg, x)]
+        x' <- eval x
+        bindVars [(arg, evaled2exp x')]
         eval body
       _ -> return $ EString "app"
 
@@ -102,9 +103,14 @@ evalOp Lt  (ENat e1) (ENat e2) = if e1 < e2 then EBool True else EBool False
 evalOp Le  (ENat e1) (ENat e2) = if e1 <= e2 then EBool True else EBool False
 
 
+evaled2exp :: EvaledExp -> Exp
+evaled2exp (ENat i) = Nat i
+
+
 showEvaledExp :: EvaledExp -> String
-showEvaledExp (ENat  i) = show i
-showEvaledExp (EBool b) = map toLower $ show b
+showEvaledExp (ENat    i) = show i
+showEvaledExp (EBool   b) = map toLower $ show b
+showEvaledExp (EString s) = s
 showEvaledExp (EList list) =
   "[" ++ concat (intersperse "," $ map showEvaledExp list) ++ "]"
 

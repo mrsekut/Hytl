@@ -1,0 +1,4 @@
+fac n = if n > 1 then n * fac (n - 1) else 1;
+fac(5) // 120
+
+1:2:3:[]; // [1,2,3]
