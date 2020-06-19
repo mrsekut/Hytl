@@ -57,7 +57,8 @@ Program :: { Program }
 
 Stmt :: { Stmt }
 	: var '=' Exp 						{ Assign $1 $3 }
-	| var var '=' Exp					{ Assign $1 (Lambda $2 $4) }
+	| var var '=' Exp					{ Assign $1 (Lambda (OneArg $2) $4) }
+	| var strList '=' Exp				{ Assign $1 (Lambda (MultArgs $2) $4) }
 	| Exp 								{ Exp $1 }
 
 Exp :: { Exp }
@@ -89,6 +90,15 @@ list : '[' elem ']'						{ $2 }
 elem : {- empty -}           	 		{ [] }
      | Exp ',' elem           			{ $1 : $3 }
      | Exp            					{ $1 : [] }
+
+
+strList : '[' strElem ']'				{ $2 }
+	 | var ':' strList					{ $1 : $3 }
+
+strElem : {- empty -}           	 	{ [] }
+     | var ',' strElem           		{ $1 : $3 }
+     | var            					{ $1 : [] }
+
 
 
 {

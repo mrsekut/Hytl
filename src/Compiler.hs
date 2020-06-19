@@ -128,19 +128,19 @@ instance LLVMOperand AST.Exp where
 
 -- if cond == bit 1 then toOperand t else toOperand e
 
-  toOperand (AST.Var x          ) = toOperand =<< getVar x
+  toOperand (AST.Var x) = toOperand =<< getVar x
 
-  toOperand (AST.Lambda arg body) = mdo
-    envBind arg body
-    toOperand (AST.Nat (-1))
+-- toOperand (AST.Lambda arg body) = mdo
+--   envBind arg body
+--   toOperand (AST.Nat (-1))
 
-  toOperand (AST.App f x) = mdo
-    exp <- getVar f
-    case exp of
-      AST.Lambda arg body -> mdo
-        bindVars [(arg, x)]
-        toOperand body
-      _ -> toOperand (AST.Nat (-1))
+  -- toOperand (AST.App f x) = mdo
+  --   exp <- getVar f
+  --   case exp of
+  --     AST.Lambda arg body -> mdo
+  --       bindVars [(arg, x)]
+  --       toOperand body
+  --     _ -> toOperand (AST.Nat (-1))
 
 
 instance LLVMOperand AST.Stmt where

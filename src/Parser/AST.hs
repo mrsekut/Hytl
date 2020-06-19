@@ -2,6 +2,7 @@ module Parser.AST
     ( Exp(..)
     , Stmt(..)
     , Program(..)
+    , Args(..)
     , Op(..)
     , EvaledExp(..)
     )
@@ -25,9 +26,15 @@ data Exp
     | If Exp Exp Exp
 
     | Var String
-    | Lambda String Exp
+    | Lambda Args Exp
     | App String Exp
     deriving (Eq, Show)
+
+
+data Args = OneArg String
+          | MultArgs [String]
+          deriving (Eq, Show)
+
 
 data Op
     = Add

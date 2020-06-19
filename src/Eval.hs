@@ -14,6 +14,7 @@ import           Data.List                      ( intersperse )
 import           Parser.AST                     ( Exp(..)
                                                 , Stmt(..)
                                                 , Program(..)
+                                                , Args(..)
                                                 , Op(..)
                                                 , EvaledExp(..)
                                                 )
@@ -63,17 +64,21 @@ instance EvalC Exp where
     case cond of
       EBool bool -> if bool then eval t else eval e
 
-  eval (Var x          ) = eval =<< getVar x
-  eval (Lambda arg body) = do
-    envBind arg body
-    return (EString "func")
+  eval (Var x           ) = eval =<< getVar x
+  eval (Lambda args body) = do
+    case args of
+      OneArg arg -> do
+        envBind arg body
+        return (EString "func")
   eval (App f x) = do
     exp <- getVar f
     case exp of
-      Lambda arg body -> do
-        x' <- eval x
-        bindVars [(arg, evaled2exp x')]
-        eval body
+      Lambda args body -> do
+        case args of
+          OneArg arg -> do
+            x' <- eval x
+            bindVars [(arg, evaled2exp x')]
+            eval body
       _ -> return $ EString "app"
 
 
