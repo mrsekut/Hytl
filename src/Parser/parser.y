@@ -44,7 +44,7 @@ import Lexer.Lexer (Token(..))
 %right '='
 %left "=>"
 %left "if" "then" "else"
-%left '[' ']' ','
+%left '[' ']' ',' ':'
 %left '>' "==" '<' "<=" ">="
 %left '+' '-'
 %left '*' '/'
