@@ -36,7 +36,8 @@ tokens :-
 
   \[                                { \s -> TokenLList }
   \]                                { \s -> TokenRList }
-  \,                                { \s -> TokenColon }
+  \,                                { \s -> TokenComma }
+  \:                                { \s -> TokenColon }
 
   if                                { \s -> TokenIf }
   then                              { \s -> TokenThen }
@@ -65,6 +66,7 @@ data Token
 
   | TokenLList
   | TokenRList
+  | TokenComma
   | TokenColon
 
   | TokenIf

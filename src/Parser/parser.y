@@ -31,7 +31,8 @@ import Lexer.Lexer (Token(..))
 
   	'[' 			{ TokenLList }
   	']' 			{ TokenRList }
-  	',' 			{ TokenColon }
+  	',' 			{ TokenComma }
+  	':' 			{ TokenColon }
 
 	"if"			{ TokenIf }
 	"then"			{ TokenThen }
@@ -72,7 +73,7 @@ Exp :: { Exp }
 	| Exp '<' Exp						{ BinOp Lt $1 $3 }
 	| Exp "<=" Exp						{ BinOp Le $1 $3 }
 
-	| '[' list ']'						{ List $2 }
+	| list								{ List $1 }
 
 	| "if" Exp "then" Exp "else" Exp 	{ If $2 $4 $6 }
 
@@ -81,9 +82,13 @@ Exp :: { Exp }
 	| bool								{ Bool $1 }
 
 
-list : {- empty -}           	 		{ [] }
-      | Exp ',' list           			{ $1 : $3 }
-      | Exp            					{ $1 : [] }
+list : '[' elem ']'						{ $2 }
+	 | Exp ':' list						{ $1 : $3 }
+
+
+elem : {- empty -}           	 		{ [] }
+     | Exp ',' elem           			{ $1 : $3 }
+     | Exp            					{ $1 : [] }
 
 
 {
