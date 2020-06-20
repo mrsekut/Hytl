@@ -66,19 +66,15 @@ instance EvalC Exp where
 
   eval (Var x           ) = eval =<< getVar x
   eval (Lambda args body) = do
-    case args of
-      OneArg arg -> do
-        envBind arg body
-        return (EString "func")
+    envBind (args2string args) body
+    return (EString "func")
   eval (App f x) = do
     exp <- getVar f
     case exp of
       Lambda args body -> do
-        case args of
-          OneArg arg -> do
-            x' <- eval x
-            bindVars [(arg, evaled2exp x')]
-            eval body
+        x' <- eval x
+        bindVars [(args2string args, evaled2exp x')]
+        eval body
       _ -> return $ EString "app"
 
 
@@ -111,6 +107,9 @@ evalOp Le  (ENat e1) (ENat e2) = if e1 <= e2 then EBool True else EBool False
 evaled2exp :: EvaledExp -> Exp
 evaled2exp (ENat i) = Nat i
 
+args2string :: Args -> String
+args2string (OneArg   arg ) = arg
+args2string (MultArgs args) = show args
 
 showEvaledExp :: EvaledExp -> String
 showEvaledExp (ENat    i) = show i
