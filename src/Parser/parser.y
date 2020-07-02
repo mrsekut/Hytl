@@ -67,6 +67,7 @@ Exp :: { Exp }
 	| Exp '*' Exp						{ BinOp Mul $1 $3 }
 	| Exp '/' Exp						{ BinOp Div $1 $3 }
 
+	| var Exp 							{ App $1 $2 }
 	| var '(' Exp ')'					{ App $1 $3 }
 	| Exp "==" Exp						{ BinOp Eq $1 $3 }
 	| Exp '>' Exp						{ BinOp Gt $1 $3 }
