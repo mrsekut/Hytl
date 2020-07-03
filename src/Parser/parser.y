@@ -37,14 +37,12 @@ import Lexer.Lexer (Token(..))
 	"if"			{ TokenIf }
 	"then"			{ TokenThen }
 	"else"			{ TokenElse }
-	semi			{ TokenSemicolon }
 
 
-%left semi
 %right '='
 %left "=>"
 %left "if" "then" "else"
-%left '[' ']' ',' ':'
+%left '(' ')' '[' ']' ',' ':'
 %left '>' "==" '<' "<=" ">="
 %left '+' '-'
 %left '*' '/'
@@ -52,8 +50,8 @@ import Lexer.Lexer (Token(..))
 %%
 
 Program :: { Program }
-	: Stmt semi							{ Program [$1] }
-	| Program Stmt semi					{ merge $1 $2 }
+	: Stmt 								{ Program [$1] }
+	| Program Stmt 						{ merge $1 $2 }
 
 Stmt :: { Stmt }
 	: var '=' Exp 						{ Assign $1 $3 }
