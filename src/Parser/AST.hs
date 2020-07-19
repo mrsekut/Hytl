@@ -2,8 +2,8 @@ module Parser.AST
     ( Exp(..)
     , Stmt(..)
     , Program(..)
-    , Args(..)
     , Op(..)
+    , Pattern(..)
     , EvaledExp(..)
     )
 where
@@ -26,14 +26,17 @@ data Exp
     | If Exp Exp Exp
 
     | Var String
-    | Lambda Args Exp
+    | Lambda [Pattern] Exp
     | App String Exp
     deriving (Eq, Show)
 
-
-data Args = OneArg String
-          | MultArgs [String]
-          deriving (Eq, Show)
+data Pattern
+  = PVar String
+  | PList [Pattern]
+  | PCons Pattern Pattern
+  | PBool Bool
+  | PInt Integer
+    deriving (Eq, Show)
 
 
 data Op

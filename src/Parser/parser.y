@@ -55,10 +55,18 @@ Program :: { Program }
 
 Stmt :: { Stmt }
 	: var '=' Exp 						{ Assign $1 $3 }
-	| var var '=' Exp					{ Assign $1 (Lambda (OneArg $2) $4) }
-	| var '(' var ')' '=' Exp			{ Assign $1 (Lambda (OneArg $3) $6) }
-	| var params '=' Exp				{ Assign $1 (Lambda (MultArgs $2) $4) }
-	| var '(' params ')' '=' Exp		{ Assign $1 (Lambda (MultArgs $3) $6) }
+	| var var '=' Exp					{ Assign $1 (Lambda [PVar $2] $4) }
+	| var '(' var ')' '=' Exp			{ Assign $1 (Lambda [PVar $3] $6) }
+	| var int '=' Exp					{ Assign $1 (Lambda [PInt $2] $4) }
+	| var '(' int ')' '=' Exp			{ Assign $1 (Lambda [PInt $3] $6) }
+	| var bool '=' Exp					{ Assign $1 (Lambda [PBool $2] $4) }
+	| var '(' bool ')' '=' Exp			{ Assign $1 (Lambda [PBool $3] $6) }
+	| var paramsVarList '=' Exp			{ Assign $1 (Lambda [PList $2] $4) }
+	| var '(' paramsVarList ')' '=' Exp	{ Assign $1 (Lambda [PList $3] $6) }
+	| var paramsIntList '=' Exp			{ Assign $1 (Lambda [PList $2] $4) }
+	| var '(' paramsIntList ')' '=' Exp	{ Assign $1 (Lambda [PList $3] $6) }
+	| var paramsBoolList '=' Exp		{ Assign $1 (Lambda [PList $2] $4) }
+	| var '(' paramsBoolList ')' '=' Exp{ Assign $1 (Lambda [PList $3] $6) }
 	| Exp 								{ Exp $1 }
 
 Exp :: { Exp }
@@ -93,14 +101,35 @@ elem : {- empty -}           	 		{ [] }
      | Exp            					{ $1 : [] }
 
 
-params : '[' param ']'					{ $2 }
-	   | var ':' params					{ $1 : $3 }
-	   | var ':' param					{ $1 : $3 }
+paramsVarList
+	: '[' varParam ']'					{ $2 }
+	| var ':' paramsVarList				{ (PVar $1)  : $3 }
+	| var ':' varParam					{ (PVar $1) : $3 }
 
-param : {- empty -}           	 		{ [] }
-      | var ',' param           		{ $1 : $3 }
-      | var            					{ $1 : [] }
+varParam
+	: {- empty -}           	 		{ [] }
+	| var ',' varParam           		{ (PVar $1) : $3 }
+	| var            					{ (PVar $1) : [] }
 
+paramsIntList
+	: '[' intParam ']'					{ $2 }
+	| int ':' paramsIntList				{ (PInt $1) : $3 }
+	| int ':' intParam					{ (PInt $1) : $3 }
+
+intParam
+	: {- empty -}           	 		{ [] }
+	| int ',' intParam           		{ (PInt $1) : $3 }
+	| int            					{ (PInt $1) : [] }
+
+paramsBoolList
+	: '[' boolParam ']'					{ $2 }
+	| bool ':' paramsBoolList			{ (PBool $1) : $3 }
+	| bool ':' boolParam				{ (PBool $1) : $3 }
+
+boolParam
+	: {- empty -}           	 		{ [] }
+	| bool ',' boolParam           		{ (PBool $1) : $3 }
+	| bool            					{ (PBool $1) : [] }
 
 
 {

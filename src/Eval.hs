@@ -28,7 +28,6 @@ import           Control.Monad.Reader           ( ReaderT
 import           Control.Monad.Trans            ( MonadIO )
 import           Control.Monad.State            ( liftIO )
 
-
 type Env = IORef [(String, Exp)]
 newtype Eval a = Eval (ReaderT Env IO a)
     deriving ( Functor
@@ -64,18 +63,18 @@ instance EvalC Exp where
     case cond of
       EBool bool -> if bool then eval t else eval e
 
-  eval (Var x           ) = eval =<< getVar x
-  eval (Lambda args body) = do
-    envBind (args2string args) body
-    return (EString "func")
-  eval (App f x) = do
-    exp <- getVar f
-    case exp of
-      Lambda args body -> do
-        x' <- eval x
-        bindVars [(args2string args, evaled2exp x')]
-        eval body
-      _ -> return $ EString "app"
+  eval (Var x) = eval =<< getVar x
+  -- eval (Lambda args body) = do
+  --   envBind (args2string args) body
+  --   return (EString "func")
+  -- eval (App f x) = do
+  --   exp <- getVar f
+  --   case exp of
+  --     Lambda args body -> do
+  --       x' <- eval x
+  --       bindVars [(args2string args, evaled2exp x')]
+  --       eval body
+  --     _ -> return $ EString "app"
 
 
 instance EvalC Stmt where
