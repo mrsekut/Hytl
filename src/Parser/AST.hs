@@ -33,7 +33,6 @@ data Exp
 data Pattern
   = PVar String
   | PList [Pattern]
-  | PCons Pattern Pattern
   | PBool Bool
   | PInt Integer
     deriving (Eq, Show)

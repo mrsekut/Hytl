@@ -14,7 +14,6 @@ import           Data.List                      ( intersperse )
 import           Parser.AST                     ( Exp(..)
                                                 , Stmt(..)
                                                 , Program(..)
-                                                , Args(..)
                                                 , Op(..)
                                                 , EvaledExp(..)
                                                 )
@@ -106,9 +105,9 @@ evalOp Le  (ENat e1) (ENat e2) = if e1 <= e2 then EBool True else EBool False
 evaled2exp :: EvaledExp -> Exp
 evaled2exp (ENat i) = Nat i
 
-args2string :: Args -> String
-args2string (OneArg   arg ) = arg
-args2string (MultArgs args) = show args
+-- args2string :: Args -> String
+-- args2string (OneArg   arg ) = arg
+-- args2string (MultArgs args) = show args
 
 showEvaledExp :: EvaledExp -> String
 showEvaledExp (ENat    i) = show i

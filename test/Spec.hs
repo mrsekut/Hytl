@@ -137,12 +137,45 @@ lexerAndParser = hspec $ do
                                      (Lambda [PList [PBool True]] (Bool True))
                                ]
                            )
+        it "cons arg" $ do
+            (P.parse . L.lexer) "f (x:xs) = xs"
+                `shouldBe` (Program
+                               [ Assign
+                                     "f"
+                                     (Lambda
+                                         [PList [(PVar "x"), (PVar "xs")]]
+                                         (Var "xs")
+                                     )
+                               ]
+                           )
         -- it "cons arg" $ do
-        --     (P.parse . L.lexer) "f (x:xs) = x"
+        --     (P.parse . L.lexer) "f (1:xs) = xs"
         --         `shouldBe` (Program
         --                        [ Assign
         --                              "f"
-        --                              (Lambda [PList [PVar "x"]] (Var "x"))
+        --                              (Lambda [PCons (PInt 1) (PVar "xs")]
+        --                                      (Var "xs")
+        --                              )
+        --                        ]
+        --                    )
+        -- it "cons arg" $ do
+        --     (P.parse . L.lexer) "f (1:[2,3]) = 1"
+        --         `shouldBe` (Program
+        --                        [ Assign
+        --                              "f"
+        --                              (Lambda [PCons (PInt 1) (PList [PInt 2, PInt 3])]
+        --                                      (Var "xs")
+        --                              )
+        --                        ]
+        --                    )
+        -- it "cons arg" $ do
+        --     (P.parse . L.lexer) "f (x:y:ys) = ys"
+        --         `shouldBe` (Program
+        --                        [ Assign
+        --                              "f"
+        --                              (Lambda [PCons (PVar "x") (Cons (PVar "y") (PVar "ys"))]
+        --                                      (Var "xs")
+        --                              )
         --                        ]
         --                    )
 
