@@ -7,165 +7,136 @@ import           Test.Hspec                     ( shouldBe
                                                 , Arg
                                                 , Expectation
                                                 )
-import           Lexer.Lexer                    ( lexer
-                                                , Token(..)
-                                                )
-import           Parser.Parser                  ( parse )
+import qualified Lexer.Lexer                   as L
+import qualified Parser.Parser                 as P
 import           Parser.AST                     ( Exp(..)
                                                 , Stmt(..)
                                                 , Program(..)
+                                                , Op(..)
                                                 )
 import           Compiler                       ( CodeGen )
 import           Type.Type                      ( Constraint(..) )
-import           Type.TypeInfer                 ( doInfers )
+-- import           Type.TypeInfer                 ( doInfers )
 import           Eval                           ( eval
                                                 , runEval
                                                 , emptyEnv
                                                 )
-import           LLVM.AST                       ( Operand )
-
-data Test = Test
-     { input :: String
-     , lexered :: [Token]
-     , parsed ::Program
-     , contraint :: Constraint
-     , compiled :: Operand
-     , evaled :: Integer
-     }
-
+-- import           LLVM.AST                       ( Operand )
 
 main :: IO ()
-main = hspec $ describe "Parser" $ do
-    spec "add" $ makeTest
-        "10 + 45;"
-        [TokenInt 10, TokenPlus, TokenInt 45, TokenSemicolon]
-        (Program [Exp (Add (Nat 10) (Nat 45))])
-        CInt
-        55
-
-    spec "sub" $ makeTest
-        "42 - 10;"
-        [TokenInt 42, TokenMinus, TokenInt 10, TokenSemicolon]
-        (Program [Exp (Sub (Nat 42) (Nat 10))])
-        CInt
-        32
-
-    spec "mul" $ makeTest
-        "1 * 3;"
-        [TokenInt 1, TokenTimes, TokenInt 3, TokenSemicolon]
-        (Program [Exp (Mul (Nat 1) (Nat 3))])
-        CInt
-        3
-
-    spec "multi" $ makeTest
-        "10 + 1 * 3;"
-        [ TokenInt 10
-        , TokenPlus
-        , TokenInt 1
-        , TokenTimes
-        , TokenInt 3
-        , TokenSemicolon
-        ]
-        (Program [Exp (Add (Nat 10) (Mul (Nat 1) (Nat 3)))])
-        CInt
-        13
-
-    spec "relational" $ makeTest
-        "1 > 2;"
-        [TokenInt 1, TokenGT, TokenInt 2, TokenSemicolon]
-        (Program [Exp (Gt (Nat 1) (Nat 2))])
-        CBool
-        0
-
-    spec "assign" $ makeTest
-        "x = 2*3 - 4/2;"
-        [ TokenVar "x"
-        , TokenAssign
-        , TokenInt 2
-        , TokenTimes
-        , TokenInt 3
-        , TokenMinus
-        , TokenInt 4
-        , TokenDiv
-        , TokenInt 2
-        , TokenSemicolon
-        ]
-        (Program [Assign "x" (Sub (Mul (Nat 2) (Nat 3)) (Div (Nat 4) (Nat 2)))])
-        CInt
-        4
-
-    spec "function define"
-        $ makeTest
-              "f x = x + 1;"
-              [ TokenVar "f"
-              , TokenVar "x"
-              , TokenAssign
-              , TokenVar "x"
-              , TokenPlus
-              , TokenInt 1
-              , TokenSemicolon
-              ]
-              (Program [Assign "f" (Lambda "x" (Add (Var "x") (Nat 1)))])
-              CInt -- FIXME:
-        - 1
-
-
-    spec "if" $ makeTest
-        "if 2>1 then 1 else 2;"
-        [ TokenIf
-        , TokenInt 2
-        , TokenGT
-        , TokenInt 1
-        , TokenThen
-        , TokenInt 1
-        , TokenElse
-        , TokenInt 2
-        , TokenSemicolon
-        ]
-        (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
-        CInt
-        1
-
-    spec "list" $ makeTest
-        "[1,2,3];"
-        [TokenLList,
-        , TokenInt 1
-        , TokenColon
-        , TokenInt 2
-        , TokenColon
-        , TokenInt 3
-        ,TokenRList]
-        (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
-        CInt
-        1
-
-    -- spec "list" $ makeTest
-    --     "[1*2, 3+4, 5];"
-    --     [TokenIf]
-    --     (Program [Exp (If (Gt (Nat 2) (Nat 1)) (Nat 1) (Nat 2))])
-    --     CInt
-    --     1
+main = lexerAndParser
 
 
 
+lexerAndParser :: IO ()
+lexerAndParser = hspec $ do
+    describe "lexer and parser test" $ do
+        it "add" $ do
+            (P.parse . L.lexer) "10 + 42"
+                `shouldBe` (Program [Exp (BinOp Add (Nat 10) (Nat 42))])
+        it "sub" $ do
+            (P.parse . L.lexer) "42 - 10"
+                `shouldBe` (Program [Exp (BinOp Sub (Nat 42) (Nat 10))])
+        it "mul" $ do
+            (P.parse . L.lexer) "1 * 3"
+                `shouldBe` (Program [Exp (BinOp Mul (Nat 1) (Nat 3))])
+        it "relational" $ do
+            (P.parse . L.lexer) "1 > 2"
+                `shouldBe` (Program [Exp (BinOp Gt (Nat 1) (Nat 2))])
+        it "assign" $ do
+            (P.parse . L.lexer) "x = 2*3 - 4/2"
+                `shouldBe` (Program
+                               [ Assign
+                                     "x"
+                                     (BinOp Sub
+                                            (BinOp Mul (Nat 2) (Nat 3))
+                                            (BinOp Div (Nat 4) (Nat 2))
+                                     )
+                               ]
+                           )
+        -- it "function defined" $ do
+        --     (P.parse . L.lexer) "f x = x + 1"
+        --         `shouldBe` (Program
+        --                        [ Assign
+        --                              "f"
+        --                              (Lambda (OneArg "x")
+        --                                      (BinOp Add (Var "x") (Nat 1))
+        --                              )
+        --                        ]
+        --                    )
+        it "if" $ do
+            (P.parse . L.lexer) "if 2>1 then 1 else 2"
+                `shouldBe` (Program
+                               [ Exp
+                                     (If (BinOp Gt (Nat 2) (Nat 1))
+                                         (Nat 1)
+                                         (Nat 2)
+                                     )
+                               ]
+                           )
+        it "list" $ do
+            (P.parse . L.lexer) "[1,2,3]"
+                `shouldBe` (Program [Exp (List [Nat 1, Nat 2, Nat 3])])
+        it "list" $ do
+            (P.parse . L.lexer) "[1*2, 3+4, 5]"
+                `shouldBe` (Program
+                               [ Exp
+                                     (List
+                                         [ BinOp Mul (Nat 1) (Nat 2)
+                                         , BinOp Add (Nat 3) (Nat 4)
+                                         , Nat 5
+                                         ]
+                                     )
+                               ]
+                           )
 
-makeTest :: String -> [Token] -> Program -> Constraint -> Integer -> Test
-makeTest inp lex par con evl = Test { input     = inp
-                                    , lexered   = lex
-                                    , parsed    = par
-                                    , contraint = con
-                                    , evaled    = evl
-                                    }
+
+    -- TODO:
+
+    -- describe "defined functions" $ do
+    --     it "normal" $ do
+    --         (P.parse . L.lexer) "f x = x"
+    --             `shouldBe` (Program [Assign "f" (Lambda (OneArg "x") (Var "x"))]
+    --                        )
+    --     it "const arg" $ do
+    --         (P.parse . L.lexer) "f 10 = 5"
+    --             `shouldBe` (Program [Exp (BinOp Add (Nat 10) (Nat 42))])
+    --     it "empty arg" $ do
+    --         (P.parse . L.lexer) "f [] = []"
+    --             `shouldBe` (Program
+    --                            [Assign "f" (Lambda (MultArgs []) (List []))]
+    --                        )
+    --     it "1 element arg" $ do
+    --         (P.parse . L.lexer) "f [x] = x"
+    --             `shouldBe` (Program
+    --                            [Assign "f" (Lambda (MultArgs ["x"]) (Var "x"))]
+    --                        )
+    --     it "2 elements arg" $ do
+    --         (P.parse . L.lexer) "f [x,y] = x"
+    --             `shouldBe` (Program
+    --                            [ Assign
+    --                                  "f"
+    --                                  (Lambda (MultArgs ["x", "y"]) (Var "x"))
+    --                            ]
+    --                        )
+    --     it "cons arg" $ do
+    --         (P.parse . L.lexer) "f (x:xs) = x"
+    --             `shouldBe` (Program
+    --                            [ Assign
+    --                                  "f"
+    --                                  (Lambda (MultArgs ["x", "xs"]) (Var "x"))
+    --                            ]
+    --                        )
+
+    -- describe "call functions" $ do
+    --     it "normal" $ do
+    --         (P.parse . L.lexer) "f 1"
+    --             `shouldBe` (Program [Exp (App "f" (Nat 1))])
+    --     it "empty" $ do
+    --         (P.parse . L.lexer) "f []"
+    --             `shouldBe` (Program [Exp (App "f" (List []))])
 
 
-spec :: String -> Test -> SpecWith (Arg Expectation)
-spec testName t = it testName $ do
-    lexer (input t) `shouldBe` lexered t
-    parse (lexered t) `shouldBe` parsed t
-    -- typeInfer
-    -- compile
-    e <- runEval (eval $ parsed t) =<< emptyEnv
-    e `shouldBe` evaled t
-
-
-
+-- typeInfer ::
+-- compiler ::
+-- eval ::
