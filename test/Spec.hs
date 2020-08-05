@@ -6,6 +6,7 @@ import           Test.Hspec                     ( shouldBe
                                                 )
 import qualified Lexer.Lexer                   as L
 import qualified Parser.Parser                 as P
+import qualified Eval                          as E
 import           Parser.AST                     ( Exp(..)
                                                 , Stmt(..)
                                                 , Program(..)
@@ -14,8 +15,9 @@ import           Parser.AST                     ( Exp(..)
                                                 )
 
 main :: IO ()
-main = lexerAndParser
-
+main = do
+    lexerAndParser
+    testEval
 
 
 lexerAndParser :: IO ()
@@ -188,6 +190,60 @@ lexerAndParser = hspec $ do
     --             `shouldBe` (Program [Exp (App "f" (List []))])
 
 
+testEval :: IO ()
+testEval = hspec $ do
+    describe "eval test" $ do
+        it "add" $ do
+            "10 + 42" `evalShouldBe` "52"
+        it "sub" $ do
+            "42 - 10" `evalShouldBe` "32"
+        it "mul" $ do
+            "1 * 3" `evalShouldBe` "3"
+        it "relational" $ do
+            "1 > 2" `evalShouldBe` "false"
+        it "assign" $ do
+            "x = 2*3 - 4/2" `evalShouldBe` "4"
+        it "if" $ do
+            "if 2>1 then 1 else 2" `evalShouldBe` "1"
+
+        it "list" $ do
+            "[1,2,3]" `evalShouldBe` "[1,2,3]"
+        it "list" $ do
+            "[1*2, 3+4, 5]" `evalShouldBe` "[2,7,5]"
+
+    -- describe "defined functions" $ do
+    --     it "normal" $ do
+    --         "f x = x + 1" `evalShouldBe` "FIXME:"
+    --     it "const int arg" $ do
+    --         "f 10 = 5" `evalShouldBe` "FIXME:"
+    --     it "const bool arg" $ do
+    --         "f true = false" `evalShouldBe` "FIXME:"
+    --     it "empty arg" $ do
+    --         "f [] = []" `evalShouldBe` "FIXME:"
+    --     it "1 element arg" $ do
+    --         "f [x] = x" `evalShouldBe` "FIXME:"
+    --     it "1 element arg with paren" $ do
+    --         "f ([x]) = x" `evalShouldBe` "FIXME:"
+    --     it "2 elements arg" $ do
+    --         "f [x,y] = x" `evalShouldBe` "FIXME:"
+    --     it "1 int element arg" $ do
+    --         "f [1] = 1" `evalShouldBe` "FIXME:"
+    --     it "1 int element arg with paren" $ do
+    --         "f ([1]) = 1" `evalShouldBe` "FIXME:"
+    --     it "1 bool element arg" $ do
+    --         "f [true] = true" `evalShouldBe` "FIXME:"
+    --     it "cons arg" $ do
+    --         "f (x:xs) = xs" `evalShouldBe` "FIXME:"
+
 -- typeInfer ::
 -- compiler ::
 -- eval ::
+
+
+-- | Utils
+
+evalShouldBe :: String -> String -> IO ()
+evalShouldBe input result = do
+    env <- E.emptyEnv
+    value <- E.runEval ((E.eval . P.parse . L.lexer) input) env
+    (E.showEvaledExp value) `shouldBe` result
