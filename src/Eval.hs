@@ -16,6 +16,7 @@ import           Parser.AST                     ( Exp(..)
                                                 , Program(..)
                                                 , Op(..)
                                                 , EvaledExp(..)
+                                                , Pattern(..)
                                                 )
 import           Data.IORef
 import           Data.Maybe
@@ -63,15 +64,15 @@ instance EvalC Exp where
       EBool bool -> if bool then eval t else eval e
 
   eval (Var x) = eval =<< getVar x
-  -- eval (Lambda args body) = do
-  --   envBind (args2string args) body
-  --   return (EString "func")
+  eval (Lambda args body) = do
+    envBind (args2key args) body
+    return (EString "func") -- FIXME:
   -- eval (App f x) = do
   --   exp <- getVar f
   --   case exp of
   --     Lambda args body -> do
   --       x' <- eval x
-  --       bindVars [(args2string args, evaled2exp x')]
+  --       bindVars [(args2key args, evaled2exp x')]
   --       eval body
   --     _ -> return $ EString "app"
 
@@ -105,9 +106,17 @@ evalOp Le  (ENat e1) (ENat e2) = if e1 <= e2 then EBool True else EBool False
 evaled2exp :: EvaledExp -> Exp
 evaled2exp (ENat i) = Nat i
 
--- args2string :: Args -> String
--- args2string (OneArg   arg ) = arg
--- args2string (MultArgs args) = show args
+
+-- generate key
+
+args2key :: [Pattern] -> String
+args2key [p] = arg2key p
+
+arg2key :: Pattern -> String
+arg2key (PVar str) = str
+arg2key (PList []) = "empty"
+
+
 
 showEvaledExp :: EvaledExp -> String
 showEvaledExp (ENat    i) = show i

@@ -42,7 +42,8 @@ import Lexer.Lexer (Token(..))
 %right '='
 %left "=>"
 %left "if" "then" "else"
-%left '(' ')' '[' ']' ',' ':'
+%right ':'
+%left '(' ')' '[' ']' ','
 %left '>' "==" '<' "<=" ">="
 %left '+' '-'
 %left '*' '/'
@@ -50,24 +51,19 @@ import Lexer.Lexer (Token(..))
 %%
 
 Program :: { Program }
-	: Stmt 								{ Program [$1] }
-	| Program Stmt 						{ merge $1 $2 }
+	: Stmt 									{ Program [$1] }
+	| Program Stmt 							{ merge $1 $2 }
 
 Stmt :: { Stmt }
-	: var '=' Exp 						{ Assign $1 $3 }
-	| var var '=' Exp					{ Assign $1 (Lambda [PVar $2] $4) }
-	| var '(' var ')' '=' Exp			{ Assign $1 (Lambda [PVar $3] $6) }
-	| var int '=' Exp					{ Assign $1 (Lambda [PInt $2] $4) }
-	| var '(' int ')' '=' Exp			{ Assign $1 (Lambda [PInt $3] $6) }
-	| var bool '=' Exp					{ Assign $1 (Lambda [PBool $2] $4) }
-	| var '(' bool ')' '=' Exp			{ Assign $1 (Lambda [PBool $3] $6) }
-	| var paramsVarList '=' Exp			{ Assign $1 (Lambda [PList $2] $4) }
-	| var '(' paramsVarList ')' '=' Exp	{ Assign $1 (Lambda [PList $3] $6) }
-	| var paramsIntList '=' Exp			{ Assign $1 (Lambda [PList $2] $4) }
-	| var '(' paramsIntList ')' '=' Exp	{ Assign $1 (Lambda [PList $3] $6) }
-	| var paramsBoolList '=' Exp		{ Assign $1 (Lambda [PList $2] $4) }
-	| var '(' paramsBoolList ')' '=' Exp{ Assign $1 (Lambda [PList $3] $6) }
-	| Exp 								{ Exp $1 }
+	: var '=' Exp							{ Assign $1 $3 }
+
+	| var var '=' Exp						{ Assign $1 (Lambda [PVar $2] $4) }
+	| var '(' var ')' '=' Exp				{ Assign $1 (Lambda [PVar $3] $6) }
+	| var '[' ']' '=' Exp					{ Assign $1 (Lambda [PList []] $5) }
+	| var '(' paramsVarList ')' '=' Exp		{ Assign $1 (Lambda [PList $3] $6) }
+
+	| Exp									{ Exp $1 }
+
 
 Exp :: { Exp }
 	: Exp '+' Exp						{ BinOp Add $1 $3 }
@@ -75,62 +71,38 @@ Exp :: { Exp }
 	| Exp '*' Exp						{ BinOp Mul $1 $3 }
 	| Exp '/' Exp						{ BinOp Div $1 $3 }
 
-	| var Exp 							{ App $1 $2 }
-	| var '(' Exp ')'					{ App $1 $3 }
+	| var Factor 						{ App $1 $2 }
+
 	| Exp "==" Exp						{ BinOp Eq $1 $3 }
 	| Exp '>' Exp						{ BinOp Gt $1 $3 }
 	| Exp ">=" Exp						{ BinOp Ge $1 $3 }
 	| Exp '<' Exp						{ BinOp Lt $1 $3 }
 	| Exp "<=" Exp						{ BinOp Le $1 $3 }
 
+	| "if" Exp "then" Exp "else" Exp 	{ If $2 $4 $6 }
 	| list								{ List $1 }
 
-	| "if" Exp "then" Exp "else" Exp 	{ If $2 $4 $6 }
+	| Factor							{ $1 }
 
+
+Factor
+	: '(' Exp ')'						{ $2 }
 	| int								{ Nat $1 }
 	| var								{ Var $1 }
 	| bool								{ Bool $1 }
 
 
 list : '[' elem ']'						{ $2 }
-	 | Exp ':' list						{ $1 : $3 }
-
+	 | Factor ':' list					{ $1 : $3 }
 
 elem : {- empty -}           	 		{ [] }
-     | Exp ',' elem           			{ $1 : $3 }
+     | Exp ',' elem          			{ $1 : $3 }
      | Exp            					{ $1 : [] }
 
 
 paramsVarList
-	: '[' varParam ']'					{ $2 }
-	| var ':' paramsVarList				{ (PVar $1)  : $3 }
-	| var ':' varParam					{ (PVar $1) : $3 }
-
-varParam
-	: {- empty -}           	 		{ [] }
-	| var ',' varParam           		{ (PVar $1) : $3 }
-	| var            					{ (PVar $1) : [] }
-
-paramsIntList
-	: '[' intParam ']'					{ $2 }
-	| int ':' paramsIntList				{ (PInt $1) : $3 }
-	| int ':' intParam					{ (PInt $1) : $3 }
-
-intParam
-	: {- empty -}           	 		{ [] }
-	| int ',' intParam           		{ (PInt $1) : $3 }
-	| int            					{ (PInt $1) : [] }
-
-paramsBoolList
-	: '[' boolParam ']'					{ $2 }
-	| bool ':' paramsBoolList			{ (PBool $1) : $3 }
-	| bool ':' boolParam				{ (PBool $1) : $3 }
-
-boolParam
-	: {- empty -}           	 		{ [] }
-	| bool ',' boolParam           		{ (PBool $1) : $3 }
-	| bool            					{ (PBool $1) : [] }
-
+	: var ':' var 						{ [PVar $1, PVar $3] }
+	| var ':' paramsVarList				{ (PVar $1) : $3 }
 
 {
 
