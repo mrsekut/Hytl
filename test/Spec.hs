@@ -80,43 +80,12 @@ lexerAndParser = hspec $ do
         it "normal" $ do
             (P.parse . L.lexer) "f x = x + 1"
                 `shouldBe` (Program [ Assign "f" (Lambda [PVar "x"] (BinOp Add (Var "x") (Nat 1))) ])
-        -- it "const int arg" $ do
-        --     (P.parse . L.lexer) "f 10 = 5"
-        --         `shouldBe` (Program [Assign "f" (Lambda [PInt 10] (Nat 5))])
-        -- it "const bool arg" $ do
-        --     (P.parse . L.lexer) "f true = false"
-        --         `shouldBe` (Program [Assign "f" (Lambda [PBool True] (Bool False))])
         it "empty arg" $ do
             (P.parse . L.lexer) "f [] = []"
                 `shouldBe` (Program [Assign "f" (Lambda [PList []] (List []))])
-        -- it "1 element arg" $ do
-        --     (P.parse . L.lexer) "f [x] = x"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PList [PVar "x"]] (Var "x")) ])
-        -- it "1 element arg with paren" $ do
-        --     (P.parse . L.lexer) "f ([x]) = x"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PList [PVar "x"]] (Var "x")) ])
-        -- it "2 elements arg" $ do
-        --     (P.parse . L.lexer) "f [x,y] = x"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PList [PVar "x", PVar "y"]] (Var "x")) ])
-        -- it "1 int element arg" $ do
-        --     (P.parse . L.lexer) "f [1] = 1"
-        --         `shouldBe` (Program [Assign "f" (Lambda [PList [PInt 1]] (Nat 1))])
-        -- it "1 int element arg with paren" $ do
-        --     (P.parse . L.lexer) "f ([1]) = 1"
-        --         `shouldBe` (Program [Assign "f" (Lambda [PList [PInt 1]] (Nat 1))])
-        -- it "1 bool element arg" $ do
-        --     (P.parse . L.lexer) "f [true] = true"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PList [PBool True]] (Bool True)) ])
         it "cons arg" $ do
             (P.parse . L.lexer) "f (x:xs) = xs"
                 `shouldBe` (Program [ Assign "f" (Lambda [PList [(PVar "x"), (PVar "xs")]] (Var "xs")) ])
-        -- it "cons arg" $ do
-        --     (P.parse . L.lexer) "f (1:xs) = xs"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PCons (PInt 1) (PVar "xs")] (Var "xs")) ])
-        -- it "cons arg" $ do
-        --     (P.parse . L.lexer) "f (1:[2,3]) = 1"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PCons (PInt 1) (PList [PInt 2, PInt 3])] (Var "xs")) ])
-        -- it "cons arg" $ do
 
     describe "call functions" $ do
         it "normal" $ do
@@ -170,24 +139,8 @@ testEval = hspec $ do
     describe "defined functions" $ do
         it "normal" $ do
             "f x = x + 1" `evalShouldBe` ""
-        -- it "const int arg" $ do
-        --     "f 10 = 5" `evalShouldBe` ""
-        -- it "const bool arg" $ do
-        --     "f true = false" `evalShouldBe` ""
         it "empty arg" $ do
             "f [] = []" `evalShouldBe` ""
-        -- it "1 element arg" $ do
-        --     "f [x] = x" `evalShouldBe` ""
-        -- it "1 element arg with paren" $ do
-        --     "f ([x]) = x" `evalShouldBe` ""
-        -- it "2 elements arg" $ do
-        --     "f [x,y] = x" `evalShouldBe` ""
-        -- it "1 int element arg" $ do
-        --     "f [1] = 1" `evalShouldBe` ""
-        -- it "1 int element arg with paren" $ do
-        --     "f ([1]) = 1" `evalShouldBe` ""
-        -- it "1 bool element arg" $ do
-        --     "f [true] = true" `evalShouldBe` ""
         it "cons arg" $ do
             "f (x:xs) = xs" `evalShouldBe` ""
 
