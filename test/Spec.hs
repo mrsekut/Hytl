@@ -1,4 +1,3 @@
-
 import qualified Eval          as E
 import qualified Lexer.Lexer   as L
 import           Parser.AST    (Exp (..), Op (..), Pattern (..), Program (..),
@@ -168,29 +167,29 @@ testEval = hspec $ do
         it "list" $ do
             "[1*2, 3+4, 5]" `evalShouldBe` "[2,7,5]"
 
-    -- describe "defined functions" $ do
-    --     it "normal" $ do
-    --         "f x = x + 1" `evalShouldBe` "FIXME:"
-    --     it "const int arg" $ do
-    --         "f 10 = 5" `evalShouldBe` "FIXME:"
-    --     it "const bool arg" $ do
-    --         "f true = false" `evalShouldBe` "FIXME:"
-    --     it "empty arg" $ do
-    --         "f [] = []" `evalShouldBe` "FIXME:"
-    --     it "1 element arg" $ do
-    --         "f [x] = x" `evalShouldBe` "FIXME:"
-    --     it "1 element arg with paren" $ do
-    --         "f ([x]) = x" `evalShouldBe` "FIXME:"
-    --     it "2 elements arg" $ do
-    --         "f [x,y] = x" `evalShouldBe` "FIXME:"
-    --     it "1 int element arg" $ do
-    --         "f [1] = 1" `evalShouldBe` "FIXME:"
-    --     it "1 int element arg with paren" $ do
-    --         "f ([1]) = 1" `evalShouldBe` "FIXME:"
-    --     it "1 bool element arg" $ do
-    --         "f [true] = true" `evalShouldBe` "FIXME:"
-    --     it "cons arg" $ do
-    --         "f (x:xs) = xs" `evalShouldBe` "FIXME:"
+    describe "defined functions" $ do
+        it "normal" $ do
+            "f x = x + 1" `evalShouldBe` ""
+        -- it "const int arg" $ do
+        --     "f 10 = 5" `evalShouldBe` ""
+        -- it "const bool arg" $ do
+        --     "f true = false" `evalShouldBe` ""
+        it "empty arg" $ do
+            "f [] = []" `evalShouldBe` ""
+        -- it "1 element arg" $ do
+        --     "f [x] = x" `evalShouldBe` ""
+        -- it "1 element arg with paren" $ do
+        --     "f ([x]) = x" `evalShouldBe` ""
+        -- it "2 elements arg" $ do
+        --     "f [x,y] = x" `evalShouldBe` ""
+        -- it "1 int element arg" $ do
+        --     "f [1] = 1" `evalShouldBe` ""
+        -- it "1 int element arg with paren" $ do
+        --     "f ([1]) = 1" `evalShouldBe` ""
+        -- it "1 bool element arg" $ do
+        --     "f [true] = true" `evalShouldBe` ""
+        it "cons arg" $ do
+            "f (x:xs) = xs" `evalShouldBe` ""
 
 -- typeInfer ::
 -- compiler ::

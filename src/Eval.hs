@@ -57,7 +57,7 @@ instance EvalC Exp where
   eval (Var x           ) = eval =<< getVar x
   eval (Lambda args body) = do
     envBind (args2key args) body
-    return (EString "func") -- FIXME:
+    return (EString "")
   -- eval (App f x) = do
   --   exp <- getVar f
   --   case exp of
