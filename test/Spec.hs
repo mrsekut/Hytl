@@ -144,6 +144,11 @@ testEval = hspec $ do
         it "cons arg" $ do
             "f (x:xs) = xs" `evalShouldBe` ""
 
+    describe "call functions" $ do
+        it "normal" $ do
+            env <- E.makeEnv [("f", Lambda [PVar "x"] (Var "x"))]
+            evalShouldBeWithEnv env "f 3" "3"
+
 -- typeInfer ::
 -- compiler ::
 -- eval ::
@@ -154,5 +159,11 @@ testEval = hspec $ do
 evalShouldBe :: String -> String -> IO ()
 evalShouldBe input result = do
     env   <- E.emptyEnv
+    value <- E.runEval ((E.eval . P.parse . L.lexer) input) env
+    (E.showEvaledExp value) `shouldBe` result
+
+
+evalShouldBeWithEnv :: E.Env -> String -> String -> IO ()
+evalShouldBeWithEnv env input result = do
     value <- E.runEval ((E.eval . P.parse . L.lexer) input) env
     (E.showEvaledExp value) `shouldBe` result

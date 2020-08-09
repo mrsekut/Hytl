@@ -6,6 +6,7 @@ module Eval
   , Env
   , runEval
   , showEvaledExp
+  , makeEnv
   )
 where
 
@@ -13,7 +14,7 @@ import           Control.Monad.Reader (MonadReader, ReaderT, ask, runReaderT)
 import           Control.Monad.State  (liftIO)
 import           Control.Monad.Trans  (MonadIO)
 import           Data.Char            (toLower)
-import           Data.IORef
+import           Data.IORef           (IORef, modifyIORef, newIORef, readIORef)
 import           Data.List            (intersperse)
 import           Data.Maybe
 import           Parser.AST           (EvaledExp (..), Exp (..), Op (..),
@@ -58,14 +59,14 @@ instance EvalC Exp where
   eval (Lambda args body) = do
     envBind (args2key args) body
     return (EString "")
-  -- eval (App f x) = do
-  --   exp <- getVar f
-  --   case exp of
-  --     Lambda args body -> do
-  --       x' <- eval x
-  --       bindVars [(args2key args, evaled2exp x')]
-  --       eval body
-  --     _ -> return $ EString "app"
+  eval (App f x) = do
+    exp <- getVar f
+    case exp of
+      Lambda args body -> do
+        x' <- eval x
+        bindVars [(args2key args, evaled2exp x')]
+        eval body
+      _ -> return $ EString "app"
 
 
 instance EvalC Stmt where
@@ -124,6 +125,8 @@ runEval (Eval m) = runReaderT m
 emptyEnv :: IO Env
 emptyEnv = newIORef []
 
+makeEnv :: [(String, Exp)] -> IO Env
+makeEnv = newIORef
 
 getVar :: String -> Eval Exp
 getVar var = do
