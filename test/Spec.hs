@@ -146,8 +146,8 @@ testEval = hspec $ do
 
     describe "call functions" $ do
         it "normal" $ do
-            env <- E.makeEnv [("f", Lambda [PVar "x"] (Var "x"))]
-            evalShouldBeWithEnv env "f 3" "3"
+            evalCallShouldBe ["f x = x + 2", "f 1"] "3"
+
 
 -- typeInfer ::
 -- compiler ::
@@ -163,7 +163,9 @@ evalShouldBe input result = do
     (E.showEvaledExp value) `shouldBe` result
 
 
-evalShouldBeWithEnv :: E.Env -> String -> String -> IO ()
-evalShouldBeWithEnv env input result = do
-    value <- E.runEval ((E.eval . P.parse . L.lexer) input) env
-    (E.showEvaledExp value) `shouldBe` result
+evalCallShouldBe :: [String] -> String -> IO ()
+evalCallShouldBe inputs result = do
+    env <- E.emptyEnv
+    let asts = map (E.eval . P.parse . L.lexer) inputs
+    evaledExps <- mapM (flip E.runEval env) asts
+    (E.showEvaledExp (last evaledExps)) `shouldBe` result
