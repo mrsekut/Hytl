@@ -147,6 +147,13 @@ testEval = hspec $ do
     describe "call functions" $ do
         it "normal" $ do
             evalCallShouldBe ["f x = x + 2", "f 1"] "3"
+        -- FIXME:
+        -- it "empty list" $ do
+        --     evalCallShouldBe ["f [] = []", "f []"] "[]"
+        it "empty list with parens" $ do
+            evalCallShouldBe ["f [] = []", "f ([])"] "[]"
+        it "factorial function" $ do
+            evalCallShouldBe ["fac n = if n > 1 then n * fac (n-1) else 1", "fac 5"] "120"
 
 
 -- typeInfer ::
