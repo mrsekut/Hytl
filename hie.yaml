@@ -1,0 +1,8 @@
+cradle:
+  stack:
+    - path: "./app/"
+      component: "hytl:exe:hytl-exe"
+    - path: "./src/"
+      component: "hytl:lib"
+    - path: "./test/Spec.hs"
+      component: "hytl:test:hytl-test"
