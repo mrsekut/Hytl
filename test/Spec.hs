@@ -77,7 +77,7 @@ lexerAndParser = hspec $ do
                 `shouldBe` (Program [Exp (List [List [Nat 3]])])
 
 
-    describe "defined functions" $ do
+    describe "define functions" $ do
         it "normal" $ do
             (P.parse . L.lexer) "f x = x + 1"
                 `shouldBe` (Program [ Assign "f" (Lambda [PVar "x"] (BinOp Add (Var "x") (Nat 1))) ])
@@ -119,13 +119,32 @@ lexerAndParser = hspec $ do
         --         `shouldBe` (Program [ Assign "f" (Lambda [PCons (PInt 1) (PList [PInt 2, PInt 3])] (Var "xs")) ])
         -- it "cons arg" $ do
 
-    -- describe "call functions" $ do
-    --     it "normal" $ do
-    --         (P.parse . L.lexer) "f 1"
-    --             `shouldBe` (Program [Exp (App "f" (Nat 1))])
-    --     it "empty" $ do
-    --         (P.parse . L.lexer) "f []"
-    --             `shouldBe` (Program [Exp (App "f" (List []))])
+    describe "call functions" $ do
+        it "normal" $ do
+            (P.parse . L.lexer) "f 1"
+                `shouldBe` (Program [Exp (App "f" (Nat 1))])
+        it "normal with parens" $ do
+            (P.parse . L.lexer) "f(1)"
+                `shouldBe` (Program [Exp (App "f" (Nat 1))])
+        -- FIXME: parse error
+        -- it "empty" $ do
+        --     (P.parse . L.lexer) "f []"
+        --         `shouldBe` (Program [Exp (App "f" (List []))])
+        it "empty with parens" $ do
+            (P.parse . L.lexer) "f([])"
+                `shouldBe` (Program [Exp (App "f" (List []))])
+        it "variable list" $ do
+            (P.parse . L.lexer) "f [x,y]"
+                `shouldBe` (Program [Exp (App "f" (List [Var "x",Var "y"]))])
+        it "variable list with parens" $ do
+            (P.parse . L.lexer) "f([x,y])"
+                `shouldBe` (Program [Exp (App "f" (List [Var "x",Var "y"]))])
+        it "num list" $ do
+            (P.parse . L.lexer) "f [1,2]"
+                `shouldBe` (Program [Exp (App "f" (List [Nat 1,Nat 2]))])
+        it "bool list" $ do
+            (P.parse . L.lexer) "f [true, false]"
+                `shouldBe` (Program [Exp (App "f" (List [Bool True,Bool False]))])
 
 
 testEval :: IO ()
