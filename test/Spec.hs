@@ -51,7 +51,7 @@ lexerAndParser = hspec $ do
         it "list" $ do
             (P.parse . L.lexer) "[1,2,3]"
                 `shouldBe` (Program [Exp (List [Nat 1, Nat 2, Nat 3])])
-        it "list" $ do
+        it "exps list" $ do
             (P.parse . L.lexer) "[1*2, 3+4, 5]"
                 `shouldBe` (Program
                                [ Exp
@@ -63,19 +63,24 @@ lexerAndParser = hspec $ do
                                      )
                                ]
                            )
+        it "cons" $ do
+            (P.parse . L.lexer) "1:2:3:[]"
+                `shouldBe` (Program [Exp (List [Nat 1, Nat 2, Nat 3])])
+        it "empty" $ do
+            (P.parse . L.lexer) "[]"
+                `shouldBe` (Program [Exp (List [])])
+        it "multi list" $ do
+            (P.parse . L.lexer) "[1,2,[3]]"
+                `shouldBe` (Program [Exp (List [Nat 1, Nat 2, List [Nat 3]])])
+        it "multi cons" $ do
+            (P.parse . L.lexer) "[3]:[]"
+                `shouldBe` (Program [Exp (List [List [Nat 3]])])
 
 
     describe "defined functions" $ do
         it "normal" $ do
             (P.parse . L.lexer) "f x = x + 1"
-                `shouldBe` (Program
-                               [ Assign
-                                     "f"
-                                     (Lambda [PVar "x"]
-                                             (BinOp Add (Var "x") (Nat 1))
-                                     )
-                               ]
-                           )
+                `shouldBe` (Program [ Assign "f" (Lambda [PVar "x"] (BinOp Add (Var "x") (Nat 1))) ])
         -- it "const int arg" $ do
         --     (P.parse . L.lexer) "f 10 = 5"
         --         `shouldBe` (Program [Assign "f" (Lambda [PInt 10] (Nat 5))])
@@ -105,45 +110,14 @@ lexerAndParser = hspec $ do
         --         `shouldBe` (Program [ Assign "f" (Lambda [PList [PBool True]] (Bool True)) ])
         it "cons arg" $ do
             (P.parse . L.lexer) "f (x:xs) = xs"
-                `shouldBe` (Program
-                               [ Assign
-                                     "f"
-                                     (Lambda
-                                         [PList [(PVar "x"), (PVar "xs")]]
-                                         (Var "xs")
-                                     )
-                               ]
-                           )
+                `shouldBe` (Program [ Assign "f" (Lambda [PList [(PVar "x"), (PVar "xs")]] (Var "xs")) ])
         -- it "cons arg" $ do
         --     (P.parse . L.lexer) "f (1:xs) = xs"
-        --         `shouldBe` (Program
-        --                        [ Assign
-        --                              "f"
-        --                              (Lambda [PCons (PInt 1) (PVar "xs")]
-        --                                      (Var "xs")
-        --                              )
-        --                        ]
-        --                    )
+        --         `shouldBe` (Program [ Assign "f" (Lambda [PCons (PInt 1) (PVar "xs")] (Var "xs")) ])
         -- it "cons arg" $ do
         --     (P.parse . L.lexer) "f (1:[2,3]) = 1"
-        --         `shouldBe` (Program
-        --                        [ Assign
-        --                              "f"
-        --                              (Lambda [PCons (PInt 1) (PList [PInt 2, PInt 3])]
-        --                                      (Var "xs")
-        --                              )
-        --                        ]
-        --                    )
+        --         `shouldBe` (Program [ Assign "f" (Lambda [PCons (PInt 1) (PList [PInt 2, PInt 3])] (Var "xs")) ])
         -- it "cons arg" $ do
-        --     (P.parse . L.lexer) "f (x:y:ys) = ys"
-        --         `shouldBe` (Program
-        --                        [ Assign
-        --                              "f"
-        --                              (Lambda [PCons (PVar "x") (Cons (PVar "y") (PVar "ys"))]
-        --                                      (Var "xs")
-        --                              )
-        --                        ]
-        --                    )
 
     -- describe "call functions" $ do
     --     it "normal" $ do
