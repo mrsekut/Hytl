@@ -3,18 +3,16 @@ module CLI
   )
 where
 
-import           Repl                           ( astRepl
-                                                , evalRepl
-                                                )
 import           Options.Applicative
+import           Repl                  (astRepl, evalRepl)
 
-import           System.FilePath.Posix          ( replaceExtension )
-import qualified Data.Text.IO                  as TIO
-import qualified Data.Text.Lazy.IO             as LT
-import qualified Data.Text                     as T
 import           Compiler
+import qualified Data.Text             as T
+import qualified Data.Text.IO          as TIO
+import qualified Data.Text.Lazy.IO     as LT
 import           Lexer.Lexer
 import           Parser.Parser
+import           System.FilePath.Posix (replaceExtension)
 
 
 data Command = Repl Bool | Compiler FilePath

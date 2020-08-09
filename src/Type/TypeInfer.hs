@@ -8,22 +8,13 @@ module Type.TypeInfer
   )
 where
 
-import           Type.Type                      ( Constraint(..) )
-import qualified Parser.AST                    as AST
-import           Control.Monad.State            ( StateT
-                                                , runStateT
-                                                , put
-                                                , get
-                                                , MonadState
-                                                )
-import           Control.Monad.Identity         ( Identity
-                                                , runIdentity
-                                                )
-import           Data.Map                       ( empty
-                                                , fromList
-                                                , Map
-                                                )
-import qualified Data.Map                      as M
+import           Control.Monad.Identity (Identity, runIdentity)
+import           Control.Monad.State    (MonadState, StateT, get, put,
+                                         runStateT)
+import           Data.Map               (Map, empty, fromList)
+import qualified Data.Map               as M
+import qualified Parser.AST             as AST
+import           Type.Type              (Constraint (..))
 
 
 
@@ -45,7 +36,7 @@ emptyTIEnv = M.fromList []
 type CEnv = Map String Constraint        -- (変数名, 型)
 type CVarInfo = (Int, Map Int Constraint)  -- (next id, (id, 型))
 data TypeState = TypeState {
-  cenv_ :: CEnv,
+  cenv_     :: CEnv,
   cvarInfo_ :: CVarInfo
 }
 newtype TI a = TI (StateT TypeState Identity a)

@@ -9,24 +9,15 @@ module Eval
   )
 where
 
-import           Data.Char                      ( toLower )
-import           Data.List                      ( intersperse )
-import           Parser.AST                     ( Exp(..)
-                                                , Stmt(..)
-                                                , Program(..)
-                                                , Op(..)
-                                                , EvaledExp(..)
-                                                , Pattern(..)
-                                                )
+import           Control.Monad.Reader (MonadReader, ReaderT, ask, runReaderT)
+import           Control.Monad.State  (liftIO)
+import           Control.Monad.Trans  (MonadIO)
+import           Data.Char            (toLower)
 import           Data.IORef
+import           Data.List            (intersperse)
 import           Data.Maybe
-import           Control.Monad.Reader           ( ReaderT
-                                                , runReaderT
-                                                , MonadReader
-                                                , ask
-                                                )
-import           Control.Monad.Trans            ( MonadIO )
-import           Control.Monad.State            ( liftIO )
+import           Parser.AST           (EvaledExp (..), Exp (..), Op (..),
+                                       Pattern (..), Program (..), Stmt (..))
 
 type Env = IORef [(String, Exp)]
 newtype Eval a = Eval (ReaderT Env IO a)
@@ -63,7 +54,7 @@ instance EvalC Exp where
     case cond of
       EBool bool -> if bool then eval t else eval e
 
-  eval (Var x) = eval =<< getVar x
+  eval (Var x           ) = eval =<< getVar x
   eval (Lambda args body) = do
     envBind (args2key args) body
     return (EString "func") -- FIXME:
@@ -113,8 +104,8 @@ args2key :: [Pattern] -> String
 args2key [p] = arg2key p
 
 arg2key :: Pattern -> String
-arg2key (PVar str) = str
-arg2key (PList []) = "empty"
+arg2key (PVar  str) = str
+arg2key (PList [] ) = "empty"
 
 
 

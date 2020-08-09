@@ -105,7 +105,15 @@ lexerAndParser = hspec $ do
         --         `shouldBe` (Program [ Assign "f" (Lambda [PList [PBool True]] (Bool True)) ])
         it "cons arg" $ do
             (P.parse . L.lexer) "f (x:xs) = xs"
-                `shouldBe` (Program [ Assign "f" (Lambda [PList [(PVar "x"), (PVar "xs")]] (Var "xs")) ])
+                `shouldBe` (Program
+                               [ Assign
+                                     "f"
+                                     (Lambda
+                                         [PList [(PVar "x"), (PVar "xs")]]
+                                         (Var "xs")
+                                     )
+                               ]
+                           )
         -- it "cons arg" $ do
         --     (P.parse . L.lexer) "f (1:xs) = xs"
         --         `shouldBe` (Program
@@ -200,6 +208,6 @@ testEval = hspec $ do
 
 evalShouldBe :: String -> String -> IO ()
 evalShouldBe input result = do
-    env <- E.emptyEnv
+    env   <- E.emptyEnv
     value <- E.runEval ((E.eval . P.parse . L.lexer) input) env
     (E.showEvaledExp value) `shouldBe` result

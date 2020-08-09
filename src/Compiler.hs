@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecursiveDo #-}
+{-# LANGUAGE RecursiveDo       #-}
 
 module Compiler
   ( CodeGen
@@ -7,26 +7,24 @@ module Compiler
   )
 where
 
-import           Data.Text.Internal.Lazy
+import           Control.Monad.State        hiding (void)
 import           Data.Functor.Identity
-import qualified Data.Map                      as M
-import           Control.Monad.State     hiding ( void )
+import qualified Data.Map                   as M
 import           Data.Maybe
+import           Data.Text.Internal.Lazy
 
-import           LLVM.Pretty
-import           LLVM.AST                hiding ( function
-                                                , value
-                                                )
+import           LLVM.AST                   hiding (function, value)
+import qualified LLVM.AST.IntegerPredicate  as IP
 import           LLVM.AST.Type
-import qualified LLVM.AST.IntegerPredicate     as IP
+import           LLVM.Pretty
 
 
+import           LLVM.IRBuilder.Constant
+import           LLVM.IRBuilder.Instruction
 import           LLVM.IRBuilder.Module
 import           LLVM.IRBuilder.Monad
-import           LLVM.IRBuilder.Instruction
-import           LLVM.IRBuilder.Constant
 
-import qualified Parser.AST                    as AST
+import qualified Parser.AST                 as AST
 
 
 newtype GenState = GenState { table :: M.Map String AST.Exp}

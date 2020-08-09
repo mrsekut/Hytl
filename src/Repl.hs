@@ -5,20 +5,12 @@ module Repl
 where
 
 
+import           Control.Monad  (unless)
+import           Eval           (Env, emptyEnv, eval, runEval, showEvaledExp)
 import           Lexer.Lexer
 import           Parser.Parser
-import           Type.TypeInfer                 ( emptyTIEnv
-                                                , infer
-                                                , CEnv
-                                                )
-import           Eval                           ( eval
-                                                , emptyEnv
-                                                , Env
-                                                , runEval
-                                                , showEvaledExp
-                                                )
 import           System.IO
-import           Control.Monad                  ( unless )
+import           Type.TypeInfer (CEnv, emptyTIEnv, infer)
 
 
 {- AST mode -}

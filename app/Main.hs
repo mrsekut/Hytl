@@ -1,6 +1,6 @@
 module Main where
 
-import           CLI                            ( cli )
+import           CLI (cli)
 
 main :: IO ()
 main = cli
