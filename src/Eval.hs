@@ -63,9 +63,16 @@ instance EvalC Exp where
     exp <- getVar f
     case exp of
       Lambda args body -> do
-        x' <- eval x
-        bindVars [(args2key args, evaled2exp x')]
-        eval body
+        case head args of -- FIXME: 単一引数のみに対応
+          PList p -> do
+            x' <- eval x
+            let keys = ps p
+            bindVars $ zi keys (evaled2exp x')
+            eval body
+          _ -> do
+            x' <- eval x
+            bindVars [(args2key args, evaled2exp x')]
+            eval body
       _ -> return $ EString "app"
 
 
@@ -83,6 +90,15 @@ instance EvalC Program where
 
 {- Utils -}
 
+
+-- FIXME: place, name, clean
+ps :: [Pattern] -> [String]
+ps ps = map (\(PVar x) -> x) ps
+
+-- FIXME: place, name, clean
+zi :: [String] -> Exp -> [(String, Exp)]
+zi (k:ks) (List (e:es)) = (k, e) : zi ks (List es)
+
 evalOp :: Op -> EvaledExp -> EvaledExp -> EvaledExp
 evalOp Add (ENat e1) (ENat e2) = ENat (e1 + e2)
 evalOp Sub (ENat e1) (ENat e2) = ENat (e1 - e2)
@@ -96,7 +112,8 @@ evalOp Le  (ENat e1) (ENat e2) = if e1 <= e2 then EBool True else EBool False
 
 
 evaled2exp :: EvaledExp -> Exp
-evaled2exp (ENat i) = Nat i
+evaled2exp (ENat i)    = Nat i
+evaled2exp (EList exp) = List (map evaled2exp exp)
 
 
 -- generate key
@@ -106,7 +123,8 @@ args2key [p] = arg2key p
 
 arg2key :: Pattern -> String
 arg2key (PVar  str) = str
-arg2key (PList [] ) = "empty"
+arg2key (PList [])  = "empty"
+arg2key (PList xs)  = "xs"
 
 
 
