@@ -66,8 +66,7 @@ instance EvalC Exp where
         case head args of -- FIXME: 単一引数のみに対応
           PList p -> do
             x' <- eval x
-            let keys = ps p
-            bindVars $ zi keys (evaled2exp x')
+            bindVars $ patternExpZip p (evaled2exp x')
             eval body
           _ -> do
             x' <- eval x
@@ -90,14 +89,6 @@ instance EvalC Program where
 
 {- Utils -}
 
-
--- FIXME: place, name, clean
-ps :: [Pattern] -> [String]
-ps ps = map (\(PVar x) -> x) ps
-
--- FIXME: place, name, clean
-zi :: [String] -> Exp -> [(String, Exp)]
-zi (k:ks) (List (e:es)) = (k, e) : zi ks (List es)
 
 evalOp :: Op -> EvaledExp -> EvaledExp -> EvaledExp
 evalOp Add (ENat e1) (ENat e2) = ENat (e1 + e2)
@@ -165,3 +156,12 @@ bindVars :: [(String, Exp)] -> Eval ()
 bindVars bindings = do
   env <- ask
   liftIO $ modifyIORef env (bindings ++)
+
+
+-- >>> patternExpZip [PVar "x", PVar "xs"] (List [Nat 1, Nat 2, Nat 3])
+-- [("x", Nat 1), ("xs", List [Nat 2, Nat 3])]
+patternExpZip :: [Pattern] -> Exp -> [(String, Exp)]
+patternExpZip ((PVar k):ks) (List (e:es)) =
+    if length ks == 0 && length es > 0
+        then [(k, List(e:es))]
+        else (k, e) : patternExpZip ks (List es)

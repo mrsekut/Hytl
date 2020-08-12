@@ -152,10 +152,10 @@ testEval = hspec $ do
         --     evalCallShouldBe ["f [] = []", "f []"] "[]"
         it "empty list with parens" $ do
             evalCallShouldBe ["f [] = []", "f ([])"] "[]"
-        it "cons" $ do
+        it "use x of x:xs" $ do
             evalCallShouldBe ["f (x:xs) = x", "f [1,2,3]"] "1"
-        -- it "cons" $ do
-        --     evalCallShouldBe ["f (x:xs) = xs", "f [1,2,3]"] "[2,3]"
+        it "use xs of x:xs" $ do
+            evalCallShouldBe ["f (x:xs) = xs", "f [1,2,3]"] "[2,3]"
         it "factorial function" $ do
             evalCallShouldBe ["fac n = if n > 1 then n * fac (n-1) else 1", "fac 5"] "120"
 
