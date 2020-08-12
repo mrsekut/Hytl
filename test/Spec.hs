@@ -156,8 +156,14 @@ testEval = hspec $ do
             evalCallShouldBe ["f (x:xs) = x", "f [1,2,3]"] "1"
         it "use xs of x:xs" $ do
             evalCallShouldBe ["f (x:xs) = xs", "f [1,2,3]"] "[2,3]"
+
+    describe "call function examples" $ do
         it "factorial function" $ do
             evalCallShouldBe ["fac n = if n > 1 then n * fac (n-1) else 1", "fac 5"] "120"
+        it "head function" $ do
+            evalCallShouldBe ["head [] = []", "head (x:xs) = x", "head [1,2,3]"] "1"
+        it "tail function" $ do
+            evalCallShouldBe ["tail (x:xs) = xs", "tail [1,2,3]"] "[2,3]"
 
 
 -- typeInfer ::
