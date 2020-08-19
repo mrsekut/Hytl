@@ -44,7 +44,7 @@ import Lexer.Lexer (Token(..))
 %left "if" "then" "else"
 %right ':'
 %left '(' ')' '[' ']' ','
-%left '>' "==" '<' "<=" ">="
+%nonassoc '>' "==" '<' "<=" ">="
 %left '+' '-'
 %left '*' '/'
 
@@ -84,13 +84,11 @@ Exp :: { Exp }
 
 	| Factor							{ $1 }
 
-
 Factor
 	: '(' Exp ')'						{ $2 }
 	| int								{ Nat $1 }
 	| var								{ Var $1 }
 	| bool								{ Bool $1 }
-	| list								{ List $1 }
 
 
 {-- List --}
