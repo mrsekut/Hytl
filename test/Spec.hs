@@ -1,14 +1,16 @@
-import qualified Eval          as E
-import qualified Lexer.Lexer   as L
-import           Parser.AST    (Exp (..), Op (..), Pattern (..), Program (..),
-                                Stmt (..))
-import qualified Parser.Parser as P
-import           Test.Hspec    (describe, hspec, it, shouldBe)
+import qualified Eval           as E
+import qualified Lexer.Lexer    as L
+import           Parser.AST     (Exp (..), Op (..), Pattern (..), Program (..),
+                                 Stmt (..))
+import qualified Parser.Parser  as P
+import           Test.Hspec     (describe, hspec, it, shouldBe)
+import qualified Type.TypeInfer as T
 
 main :: IO ()
 main = do
     lexerAndParser
     testEval
+    testTypeInfer
 
 
 lexerAndParser :: IO ()
@@ -166,7 +168,14 @@ testEval = hspec $ do
             evalCallShouldBe ["tail (x:xs) = xs", "tail [1,2,3]"] "[2,3]"
 
 
--- typeInfer ::
+testTypeInfer :: IO ()
+testTypeInfer  = hspec $ do
+    describe "type infer test" $ do
+        it "CInt" $ do
+            "10" `typeShouldBe` "[CInt]"
+        it "CBool" $ do
+            "true" `typeShouldBe` "[CBool]"
+
 -- compiler ::
 -- eval ::
 
@@ -177,7 +186,7 @@ evalShouldBe :: String -> String -> IO ()
 evalShouldBe input result = do
     env   <- E.emptyEnv
     value <- E.runEval ((E.eval . P.parse . L.lexer) input) env
-    (E.showEvaledExp value) `shouldBe` result
+    (show value) `shouldBe` result
 
 
 evalCallShouldBe :: [String] -> String -> IO ()
@@ -185,4 +194,10 @@ evalCallShouldBe inputs result = do
     env <- E.emptyEnv
     let asts = map (E.eval . P.parse . L.lexer) inputs
     evaledExps <- mapM (flip E.runEval env) asts
-    (E.showEvaledExp (last evaledExps)) `shouldBe` result
+    (show (last evaledExps)) `shouldBe` result
+
+
+typeShouldBe :: String -> String -> IO ()
+typeShouldBe input result = do
+    let constraint = T.infer T.emptyTIEnv ((P.parse . L.lexer) input)
+    show constraint `shouldBe` result

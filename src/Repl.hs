@@ -6,7 +6,7 @@ where
 
 
 import           Control.Monad  (unless)
-import           Eval           (Env, emptyEnv, eval, runEval, showEvaledExp)
+import           Eval           (Env, emptyEnv, eval, runEval)
 import           Lexer.Lexer
 import           Parser.Parser
 import           System.IO
@@ -48,7 +48,7 @@ evalRepl = do
       print_ $ show typ
       replIO env tiEnv
     | otherwise = do
-      print_ $ showEvaledExp value
+      print_ $ show value
       replIO env tiEnv
 
 

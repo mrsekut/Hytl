@@ -7,6 +7,8 @@ module Parser.AST
     , EvaledExp(..)
     )
 where
+import           Data.Char (toLower)
+import           Data.List (intersperse)
 
 newtype Program = Program [Stmt] deriving (Show, Eq)
 
@@ -55,4 +57,13 @@ data EvaledExp
     | EBool Bool
     | EString String
     | EList [EvaledExp]
-    deriving (Eq, Show)
+    deriving (Eq)
+
+
+-- Utils
+instance Show EvaledExp where
+  show (ENat    i) = show i
+  show (EBool   b) = map toLower $ show b
+  show (EString s) = s
+  show (EList list) =
+    "[" ++ concat (intersperse "," $ map show list) ++ "]"

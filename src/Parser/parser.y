@@ -89,6 +89,7 @@ Factor
 	| int								{ Nat $1 }
 	| var								{ Var $1 }
 	| bool								{ Bool $1 }
+	| list								{ List $1 }
 
 
 {-- List --}

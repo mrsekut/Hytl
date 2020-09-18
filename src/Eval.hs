@@ -5,7 +5,6 @@ module Eval
   , emptyEnv
   , Env
   , runEval
-  , showEvaledExp
   , makeEnv
   )
 where
@@ -13,9 +12,7 @@ where
 import           Control.Monad.Reader (MonadReader, ReaderT, ask, runReaderT)
 import           Control.Monad.State  (liftIO)
 import           Control.Monad.Trans  (MonadIO)
-import           Data.Char            (toLower)
 import           Data.IORef           (IORef, modifyIORef, newIORef, readIORef)
-import           Data.List            (intersperse)
 import           Data.Maybe
 import           Parser.AST           (EvaledExp (..), Exp (..), Op (..),
                                        Pattern (..), Program (..), Stmt (..))
@@ -116,15 +113,6 @@ arg2key :: Pattern -> String
 arg2key (PVar  str) = str
 arg2key (PList [])  = "empty"
 arg2key (PList xs)  = "xs"
-
-
-
-showEvaledExp :: EvaledExp -> String
-showEvaledExp (ENat    i) = show i
-showEvaledExp (EBool   b) = map toLower $ show b
-showEvaledExp (EString s) = s
-showEvaledExp (EList list) =
-  "[" ++ concat (intersperse "," $ map showEvaledExp list) ++ "]"
 
 
 runEval :: Eval EvaledExp -> Env -> IO EvaledExp
