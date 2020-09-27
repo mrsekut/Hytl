@@ -126,8 +126,14 @@ testEval = hspec $ do
             "42 - 10" `evalShouldBe` "32"
         it "mul" $ do
             "1 * 3" `evalShouldBe` "3"
-        it "relational" $ do
+        it "bt" $ do
             "1 > 2" `evalShouldBe` "false"
+        it "lt" $ do
+            "1 < 2" `evalShouldBe` "true"
+        it "bte" $ do
+            "1 >= 2" `evalShouldBe` "false"
+        it "lte" $ do
+            "2 <= 2" `evalShouldBe` "true"
         it "assign" $ do
             "x = 2*3 - 4/2" `evalShouldBe` "4"
         it "if" $ do
