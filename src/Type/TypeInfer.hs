@@ -81,9 +81,10 @@ instance TypeInfer AST.Exp where
 
   doInfer (AST.If b t e) = do
     unify CBool =<< doInfer b
-    unify CInt =<< doInfer t -- FIXME:
-    unify CInt =<< doInfer e -- FIXME:
-    return CBool
+    ttype <- doInfer t
+    etype <- doInfer e
+    unify ttype etype
+    return ttype
 
 
   doInfer (AST.Var  x) = do
