@@ -182,8 +182,28 @@ testTypeInfer  = hspec $ do
         it "CBool" $ do
             "true" `typeShouldBe` "[CBool]"
 
+        it "add" $ do
+            "1 + 2" `typeShouldBe` "[CInt]"
+        it "sub" $ do
+            "2 - 1" `typeShouldBe` "[CInt]"
+        it "mul" $ do
+            "2 * 1" `typeShouldBe` "[CInt]"
+        it "div" $ do
+            "2 / 1" `typeShouldBe` "[CInt]"
+        it "calc" $ do
+            "1 + 2 * 3 - 2" `typeShouldBe` "[CInt]"
+
+        it "lte" $ do
+            "1 <= 3" `typeShouldBe` "[CBool]"
+        it "gt" $ do
+            "1 > 3" `typeShouldBe` "[CBool]"
+        -- it "if" $ do
+        --     "if true then 3 else 4" `typeShouldBe` "[CBool]"
+        --     "if true then true else false" `typeShouldBe` "[CBool]"
+        --     "if 3>4 then true else false" `typeShouldBe` "[CBool]"
+
+
 -- compiler ::
--- eval ::
 
 
 -- | Utils

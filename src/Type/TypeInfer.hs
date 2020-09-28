@@ -57,22 +57,34 @@ instance TypeInfer AST.Exp where
   doInfer (AST.Nat  i) = return CInt
   doInfer (AST.Bool x) = return CBool
 
--- doInfer (AST.Add x1 x2) = do
---   unify CInt =<< doInfer x1
---   unify CInt =<< doInfer x2
---   return CInt
--- doInfer (AST.Sub x1 x2) = do
---   unify CInt =<< doInfer x1
---   unify CInt =<< doInfer x2
---   return CInt
--- doInfer (AST.Mul x1 x2) = do
---   unify CInt =<< doInfer x1
---   unify CInt =<< doInfer x2
---   return CInt
--- doInfer (AST.Div x1 x2) = do
---   unify CInt =<< doInfer x1
---   unify CInt =<< doInfer x2
---   return CInt
+  doInfer (AST.BinOp AST.Add x1 x2) = do
+    unify CInt =<< doInfer x1
+    unify CInt =<< doInfer x2
+    return CInt
+  doInfer (AST.BinOp AST.Sub x1 x2) = do
+    unify CInt =<< doInfer x1
+    unify CInt =<< doInfer x2
+    return CInt
+  doInfer (AST.BinOp AST.Mul x1 x2) = do
+    unify CInt =<< doInfer x1
+    unify CInt =<< doInfer x2
+    return CInt
+  doInfer (AST.BinOp AST.Div x1 x2) = do
+    unify CInt =<< doInfer x1
+    unify CInt =<< doInfer x2
+    return CInt
+
+  doInfer (AST.BinOp op x1 x2) = do
+    unify CInt =<< doInfer x1
+    unify CInt =<< doInfer x2
+    return CBool
+
+  doInfer (AST.If b t e) = do
+    unify CBool =<< doInfer b
+    unify CInt =<< doInfer t -- FIXME:
+    unify CInt =<< doInfer e -- FIXME:
+    return CBool
+
 
   doInfer (AST.Var  x) = do
     state <- get
