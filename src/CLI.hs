@@ -4,7 +4,7 @@ module CLI
 where
 
 import           Options.Applicative
-import           Repl                  (astRepl, evalRepl)
+import           Repl                  (repl)
 
 import           Compiler
 import qualified Data.Text             as T
@@ -26,8 +26,7 @@ cli = cliOption =<< execParser parseInfo
  where
   cliOption :: Command -> IO ()
   cliOption cmd = case cmd of
-    Repl     True     -> astRepl
-    Repl     False    -> evalRepl
+    Repl     False    -> repl
     Compiler filepath -> compileFile filepath
 
   parseInfo :: ParserInfo Command

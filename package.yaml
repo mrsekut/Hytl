@@ -29,6 +29,7 @@ dependencies:
   - llvm-hs-pure == 9.0.0
   - llvm-hs-pretty == 0.6.2.0
   - containers
+  - haskeline
 
 library:
   source-dirs: src

@@ -1,65 +1,86 @@
-module Repl
-  ( astRepl
-  , evalRepl
-  )
-where
+module Repl (repl) where
+
+import           Control.Monad.Trans      (liftIO)
+import           Data.List                (isPrefixOf)
+import qualified Eval                     as E
+import qualified Lexer.Lexer              as L
+import qualified Parser.Parser            as P
+import           Prelude                  hiding (read)
+import qualified System.Console.Haskeline as Repl
+import           Type.TypeInfer           (CEnv, emptyTIEnv, infer)
 
 
-import           Control.Monad  (unless)
-import           Eval           (Env, emptyEnv, eval, runEval)
-import           Lexer.Lexer
-import           Parser.Parser
-import           System.IO
-import           Type.TypeInfer (CEnv, emptyTIEnv, infer)
+repl :: IO ()
+repl = do
+  inprEnv <- E.emptyEnv
+  Repl.runInputT Repl.defaultSettings (loop inprEnv)
 
 
-{- AST mode -}
-
-astRepl :: IO ()
-astRepl = repl $ show . parse . lexer
- where
-  repl :: (String -> String) -> IO ()
-  repl eval = do
-    input <- read_
-    unless (input == ":quit") $ print_ (eval input) >> repl eval
-
-
-
-
-{- Eval mode -}
-
-evalRepl :: IO ()
-evalRepl = do
-  inprEnv <- emptyEnv
-  replIO inprEnv emptyTIEnv
- where
-  replIO :: Env -> CEnv -> IO ()
-  replIO env tiEnv = do
-    input <- read_
-    let ast = (parse . lexer) input
-    value <- runEval (eval ast) env
-
-    let typ = infer tiEnv ast
-    f input value env tiEnv typ
-
-  f input value env tiEnv typ
-    | input == ":quit" || input == ":q" = pure ()
-    | input == ":type" || input == ":t" = do
-      print_ $ show typ
-      replIO env tiEnv
-    | otherwise = do
-      print_ $ show value
-      replIO env tiEnv
+loop :: E.Env -> Repl.InputT IO ()
+loop env = do
+  input <- read
+  outcome <- liftIO $ run env input
+  case outcome of
+    End  -> return ()
+    Loop -> loop env
 
 
 
-{- Utils -}
 
-read_ :: IO String
-read_ = do
-  putStr "hytl> "
-  hFlush stdout
-  getLine
+-- Read
 
-print_ :: String -> IO ()
-print_ = putStrLn
+
+read :: Repl.InputT IO Input
+read = do
+  maybeLine <- Repl.getInputLine "hytl> "
+  case maybeLine of
+    Nothing    -> return Quit
+    Just chars -> return $ categorize chars
+
+
+categorize :: String -> Input
+categorize input
+  | elem input [":q", ":quit"] = Quit
+  | startWith [":t", ":type"] input = Type (eliminateCommand input)
+  | startWith [":a", ":ast"] input = AST (eliminateCommand input)
+  | otherwise = Run input
+
+
+startWith :: [String] -> String -> Bool
+startWith [] _       = False
+startWith cmds input = or $ map (flip isPrefixOf input) cmds
+
+
+eliminateCommand :: String -> String
+eliminateCommand = drop 1 . dropWhile (>' ')
+
+
+
+
+-- Run
+
+
+data Input
+  = Quit
+  | Type String
+  | Run String
+  | AST String
+
+
+data Outcome
+  = Loop
+  | End
+
+
+run :: E.Env -> Input ->  IO Outcome
+run _ Quit          = return End
+run _ (Type _)      = undefined -- TODO:
+run _ (AST input)   =
+  do  let ast = (P.parse . L.lexer) input
+      putStrLn $ show ast
+      return Loop
+run env (Run input) =
+  do  let ast = (P.parse . L.lexer) input
+      value <- E.runEval (E.eval ast) env
+      putStrLn $ show value
+      return Loop
