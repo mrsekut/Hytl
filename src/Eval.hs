@@ -43,8 +43,8 @@ instance EvalC Exp where
     e2 <- eval x2
     return $ evalOp op e1 e2
 
-  eval (List exp) = do
-    list <- mapM eval exp
+  eval (List exps) = do
+    list <- mapM eval exps
     return $ EList list
 
   eval (If b t e) = do

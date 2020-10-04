@@ -57,22 +57,7 @@ instance TypeInfer AST.Exp where
   doInfer (AST.Nat  i) = return CInt
   doInfer (AST.Bool x) = return CBool
 
-  doInfer (AST.BinOp AST.Add x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
-  doInfer (AST.BinOp AST.Sub x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
-  doInfer (AST.BinOp AST.Mul x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
-  doInfer (AST.BinOp AST.Div x1 x2) = do
-    unify CInt =<< doInfer x1
-    unify CInt =<< doInfer x2
-    return CInt
+  doInfer (AST.BinOp op x1 x2) = unifyOp op x1 x2
 
   doInfer (AST.BinOp op x1 x2) = do
     unify CInt =<< doInfer x1
@@ -177,3 +162,27 @@ createVar = do
   put $ state { cvarInfo_ = (nextIdx + 1, varMap) }
   return $ CVar nextIdx
 
+
+
+unifyOp :: AST.Op -> AST.Exp -> AST.Exp -> TI Constraint
+unifyOp op x1 x2 = do
+  t1 <- doInfer x1
+  t2 <- doInfer x2
+  unify t1 t2
+  pure $ case op of
+    AST.Add -> CInt
+    AST.Sub -> CInt
+    AST.Mul -> CInt
+    AST.Div -> CInt
+    AST.Eq  -> CBool
+    AST.Gt  -> CBool
+    AST.Ge  -> CBool
+    AST.Lt  -> CBool
+    AST.Le  -> CBool
+
+
+equivalent :: AST.Exp -> AST.Exp -> TI Bool
+equivalent e1 e2 = do
+    t1 <- doInfer e1
+    t2 <- doInfer e2
+    pure $ t1 == t2

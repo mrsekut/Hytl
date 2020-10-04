@@ -8,13 +8,13 @@ import qualified Type.TypeInfer as T
 
 main :: IO ()
 main = do
-    lexerAndParser
+    testLexerAndParser
     testEval
     testTypeInfer
 
 
-lexerAndParser :: IO ()
-lexerAndParser = hspec $ do
+testLexerAndParser :: IO ()
+testLexerAndParser = hspec $ do
     describe "lexer and parser test" $ do
         it "add" $ do
             (P.parse . L.lexer) "10 + 42"
@@ -79,14 +79,12 @@ lexerAndParser = hspec $ do
 
 
     describe "define functions" $ do
-        -- FIXME: parse error
-        -- it "normal" $ do
-        --     (P.parse . L.lexer) "f x = x"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PVar "x"] (Var "x")) ])
-        -- FIXME:
-        -- it "normal" $ do
-        --     (P.parse . L.lexer) "f x = x + 1"
-        --         `shouldBe` (Program [ Assign "f" (Lambda [PInt 1] (BinOp Add (Var "x") (Nat 1))) ])
+        it "normal" $ do
+            (P.parse . L.lexer) "f x = x"
+                `shouldBe` (Program [ Assign "f" (Lambda [PVar "x"] (Var "x")) ])
+        it "normal" $ do
+            (P.parse . L.lexer) "f x = x + 1"
+                `shouldBe` (Program [ Assign "f" (Lambda [PVar "x"] (BinOp Add (Var "x") (Nat 1))) ])
         -- FIXME:
         -- it "const" $ do
         --     (P.parse . L.lexer) "f 1 = 1"
